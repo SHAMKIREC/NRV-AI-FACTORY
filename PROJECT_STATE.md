@@ -2,7 +2,7 @@
 
 | Project | Status | Current task | Last completed | Next action | Blockers |
 |---|---|---|---|---|---|
-| LOGIX | ACTIVE | LOGIX-001 | — | INITIAL_AUDIT | NONE |
+| LOGIX | ACTIVE | LOGIX-002 | LOGIX-001 | STABILIZE_NAVIGATION_SHELL | NONE |
 | DOKMARKET | NOT_STARTED | — | — | AUDIT | NONE |
 | RB | NOT_STARTED | — | — | AUDIT | NONE |
 | NRV-DIGITAL | NOT_STARTED | — | — | AUDIT | NONE |
