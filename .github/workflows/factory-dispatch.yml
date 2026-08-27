@@ -1,0 +1,57 @@
+name: NRV Factory Dispatcher
+
+on:
+  issues:
+    types: [opened, edited, reopened, closed]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  mark-event:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record factory event
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            if (!issue) {
+              core.info('Manual dispatcher run. No issue event to record.');
+              return;
+            }
+
+            const body = context.payload.comment?.body || issue.body || '';
+            const isFactoryTask = /TASK_ID:|\[TASK\]|MANAGER LOOP|CHANGES_REQUESTED|PROJECT_COMPLETE/i.test(`${issue.title}\n${body}`);
+            if (!isFactoryTask) {
+              core.info('Not a Factory task event; ignoring.');
+              return;
+            }
+
+            const marker = '<!-- nrv-factory-dispatch -->';
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              per_page: 100,
+            });
+            const recentMarker = comments
+              .filter(c => c.user?.login === 'github-actions[bot]' && c.body?.includes(marker))
+              .sort((a,b) => new Date(b.created_at) - new Date(a.created_at))[0];
+
+            if (recentMarker && Date.now() - new Date(recentMarker.created_at).getTime() < 60_000) {
+              core.info('Recent dispatch marker exists; avoiding event loop.');
+              return;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              body: `${marker}\n🤖 **NRV Factory event зарегистрирован**\n\nСобытие: \`${context.eventName}\`\nСтатус: **READY_FOR_AGENT**\n\nАгент при следующем запуске должен прочитать эту задачу/отчёт и продолжить цикл по AGENTS.md.`,
+            });
