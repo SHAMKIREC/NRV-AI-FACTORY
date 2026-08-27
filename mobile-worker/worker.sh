@@ -42,7 +42,9 @@ find_agent() {
     return
   fi
   if command -v codex >/dev/null 2>&1; then
-    printf '%s' 'codex exec --full-auto'
+    # Codex CLI 0.150.x: exec accepts sandbox and config options directly.
+    # Keep automation non-interactive but sandboxed to the workspace.
+    printf '%s' 'codex exec -s workspace-write -c approval_policy=never'
     return
   fi
   if command -v opencode >/dev/null 2>&1; then
