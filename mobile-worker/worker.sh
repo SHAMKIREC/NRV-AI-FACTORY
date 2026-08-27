@@ -1,5 +1,5 @@
-#!/data/data/com.termux/files/usr/bin/bash
-set -u
+#!/usr/bin/env bash
+set -uo pipefail
 
 FACTORY_REPO="SHAMKIREC/NRV-AI-FACTORY"
 FACTORY_DIR="$HOME/NRV-AI-FACTORY"
@@ -7,6 +7,7 @@ STATE_DIR="$HOME/.nrv-factory"
 LOG_FILE="$STATE_DIR/worker.log"
 LOCK_FILE="$STATE_DIR/worker.lock"
 POLL_SECONDS="${NRV_POLL_SECONDS:-300}"
+TASK_TIMEOUT="${NRV_TASK_TIMEOUT:-1200}"
 mkdir -p "$STATE_DIR"
 
 log() {
@@ -16,7 +17,15 @@ log() {
 cleanup() {
   rm -f "$LOCK_FILE"
 }
-trap cleanup EXIT INT TERM
+
+stop_worker() {
+  log "Worker остановлен пользователем"
+  cleanup
+  exit 130
+}
+
+trap cleanup EXIT
+trap stop_worker INT TERM
 
 if [ -e "$LOCK_FILE" ]; then
   old_pid="$(cat "$LOCK_FILE" 2>/dev/null || true)"
@@ -35,24 +44,14 @@ if ! gh auth status >/dev/null 2>&1; then
   log "ERROR: GitHub CLI не авторизован. Выполни: gh auth login"
   exit 1
 fi
-
-find_agent() {
-  if [ -n "${NRV_AGENT_COMMAND:-}" ]; then
-    printf '%s' "$NRV_AGENT_COMMAND"
-    return
-  fi
-  if command -v codex >/dev/null 2>&1; then
-    # Codex CLI 0.150.x: exec accepts sandbox and config options directly.
-    # Keep automation non-interactive but sandboxed to the workspace.
-    printf '%s' 'codex exec -s workspace-write -c approval_policy=never'
-    return
-  fi
-  if command -v opencode >/dev/null 2>&1; then
-    printf '%s' 'opencode run'
-    return
-  fi
-  printf '%s' ''
-}
+if ! command -v codex >/dev/null 2>&1; then
+  log "ERROR: Codex CLI не установлен"
+  exit 1
+fi
+if ! command -v timeout >/dev/null 2>&1; then
+  log "ERROR: команда timeout не найдена (нужен coreutils)"
+  exit 1
+fi
 
 project_repo() {
   case "$1" in
@@ -100,36 +99,35 @@ run_task() {
 
   if [ -z "$task_id" ] || [ -z "$project" ]; then
     log "Issue #$issue_number пропущен: нет TASK_ID/PROJECT"
-    return
+    return 1
   fi
   if [ -e "$marker" ]; then
-    return
+    return 0
   fi
   if [ -z "$repo" ]; then
     log "$task_id BLOCKED: неизвестный проект $project"
     post_report "$issue_number" "TASK_ID: $task_id\nSTATUS: BLOCKED\nSUMMARY: Mobile Worker не знает GitHub repository для проекта $project.\nFILES_CHANGED: none\nCOMMITS: none\nTESTS: not run\nKNOWN_ISSUES: project mapping missing\nSCREEN_CHECK: not run\nRECOMMENDATION: добавить mapping проекта в mobile-worker/worker.sh"
     touch "$marker"
-    return
+    return 0
   fi
 
-  agent="$(find_agent)"
-  if [ -z "$agent" ]; then
-    log "$task_id найден, но AI CLI не установлен"
-    return
-  fi
-
-  workdir="$(ensure_repo "$repo")" || { log "$task_id: не удалось получить $repo"; return; }
+  workdir="$(ensure_repo "$repo")" || { log "$task_id: не удалось получить $repo"; return 1; }
   branch="factory/${task_id,,}"
-  git -C "$workdir" checkout main >>"$LOG_FILE" 2>&1 || return
-  git -C "$workdir" pull --ff-only origin main >>"$LOG_FILE" 2>&1 || return
+
+  # Worker owns this clone. Clear leftovers from an interrupted attempt before retrying.
+  git -C "$workdir" reset --hard HEAD >>"$LOG_FILE" 2>&1 || true
+  git -C "$workdir" checkout main >>"$LOG_FILE" 2>&1 || return 1
+  git -C "$workdir" pull --ff-only origin main >>"$LOG_FILE" 2>&1 || return 1
   if git -C "$workdir" show-ref --verify --quiet "refs/heads/$branch"; then
-    git -C "$workdir" checkout "$branch" >>"$LOG_FILE" 2>&1 || return
-    git -C "$workdir" rebase main >>"$LOG_FILE" 2>&1 || return
+    git -C "$workdir" checkout "$branch" >>"$LOG_FILE" 2>&1 || return 1
+    git -C "$workdir" reset --hard main >>"$LOG_FILE" 2>&1 || return 1
   else
-    git -C "$workdir" checkout -b "$branch" >>"$LOG_FILE" 2>&1 || return
+    git -C "$workdir" checkout -b "$branch" >>"$LOG_FILE" 2>&1 || return 1
   fi
 
   prompt_file="$STATE_DIR/prompt-${task_id}.txt"
+  task_log="$STATE_DIR/task-${task_id}.log"
+  : > "$task_log"
   cat > "$prompt_file" <<PROMPT
 Ты Developer Agent в NRV-AI-FACTORY.
 Выполни только задачу ниже в текущем GitHub-проекте.
@@ -145,16 +143,30 @@ $body
 - не выполняй destructive migrations;
 - не меняй unrelated functionality;
 - работай в текущей ветке $branch;
-- перед завершением изучи package.json и запускай только существующие проверки;
+- перед завершением изучи package.json и запускай только существующие проверки, которые доступны локально;
 - если безопасно выполнить нельзя, не имитируй успех: создай файл NRV_BLOCKED.md с точной причиной;
 - не коммить изменения самостоятельно: Worker сделает commit после проверок.
 PROMPT
 
-  log "$task_id: запускаю $agent в $repo"
+  log "$task_id: запускаю Codex в $repo (таймаут ${TASK_TIMEOUT}s)"
   set +e
-  (cd "$workdir" && eval "$agent \"$(cat "$prompt_file" | sed 's/"/\\"/g')\"") >>"$LOG_FILE" 2>&1
+  (
+    cd "$workdir" || exit 1
+    timeout --signal=INT --kill-after=30s "$TASK_TIMEOUT" \
+      codex exec --ephemeral --skip-git-repo-check \
+      -s workspace-write -c approval_policy=never -C "$workdir" - \
+      < "$prompt_file" 2>&1 | tee -a "$task_log" "$LOG_FILE"
+    exit "${PIPESTATUS[0]}"
+  )
   agent_rc=$?
-  set -e
+  set -u
+
+  if [ "$agent_rc" -eq 124 ] || [ "$agent_rc" -eq 137 ]; then
+    log "$task_id: TIMEOUT; Codex остановлен, задача останется активной"
+    post_report "$issue_number" "TASK_ID: $task_id\nSTATUS: CHANGES_REQUESTED\nSUMMARY: Mobile Worker остановил зависший запуск Codex по таймауту.\nFILES_CHANGED: none committed\nCOMMITS: none\nTESTS: not run\nKNOWN_ISSUES: Codex timeout; подробности в task-$task_id.log\nSCREEN_CHECK: not run\nRECOMMENDATION: повторить задачу после проверки лога"
+    git -C "$workdir" reset --hard HEAD >>"$LOG_FILE" 2>&1 || true
+    return 1
+  fi
 
   if [ -f "$workdir/NRV_BLOCKED.md" ]; then
     reason="$(cat "$workdir/NRV_BLOCKED.md")"
@@ -162,18 +174,18 @@ PROMPT
     git -C "$workdir" reset --hard HEAD >>"$LOG_FILE" 2>&1
     post_report "$issue_number" "TASK_ID: $task_id\nSTATUS: BLOCKED\nSUMMARY: $reason\nFILES_CHANGED: none committed\nCOMMITS: none\nTESTS: not run\nKNOWN_ISSUES: blocked by agent\nSCREEN_CHECK: not run\nRECOMMENDATION: требуется решение владельца или новая безопасная задача"
     touch "$marker"
-    return
+    return 0
   fi
 
   if [ "$agent_rc" -ne 0 ]; then
-    log "$task_id: агент завершился с кодом $agent_rc; задача останется активной"
-    return
+    log "$task_id: Codex завершился с кодом $agent_rc; задача останется активной"
+    return 1
   fi
 
   changed="$(git -C "$workdir" status --porcelain)"
   if [ -z "$changed" ]; then
     log "$task_id: агент не внёс изменений"
-    return
+    return 1
   fi
 
   tests="not configured"
@@ -191,24 +203,26 @@ PROMPT
   if [ "$test_status" != "PASS" ]; then
     post_report "$issue_number" "TASK_ID: $task_id\nSTATUS: CHANGES_REQUESTED\nSUMMARY: Агент внёс изменения, но автоматические проверки не прошли. Изменения оставлены только локально в Worker и не запушены.\nFILES_CHANGED: $(git -C "$workdir" status --short | tr '\n' '; ')\nCOMMITS: none\nTESTS: $tests\nKNOWN_ISSUES: см. mobile worker log\nSCREEN_CHECK: not run\nRECOMMENDATION: исправить тесты/build и повторить задачу"
     git -C "$workdir" reset --hard HEAD >>"$LOG_FILE" 2>&1
-    return
+    return 1
   fi
 
   git -C "$workdir" add -A
-  git -C "$workdir" commit -m "factory: complete $task_id" >>"$LOG_FILE" 2>&1 || return
-  git -C "$workdir" push -u origin "$branch" >>"$LOG_FILE" 2>&1 || return
+  git -C "$workdir" commit -m "factory: complete $task_id" >>"$LOG_FILE" 2>&1 || return 1
+  git -C "$workdir" push -u origin "$branch" >>"$LOG_FILE" 2>&1 || return 1
   commit="$(git -C "$workdir" rev-parse HEAD)"
   files="$(git -C "$workdir" show --name-only --format='' HEAD | paste -sd ', ' -)"
 
   post_report "$issue_number" "TASK_ID: $task_id\nSTATUS: REVIEW\nSUMMARY: Mobile Worker завершил безопасную реализацию и запушил рабочую ветку.\nFILES_CHANGED: $files\nCOMMITS: $commit\nTESTS: $tests\nKNOWN_ISSUES: требуется Reviewer pass перед merge\nSCREEN_CHECK: not run unless browser agent is connected\nRECOMMENDATION: Reviewer должен проверить diff и acceptance criteria; при APPROVED создать/слить PR и выдать следующую TASK"
   touch "$marker"
   log "$task_id: REPORT отправлен"
+  return 0
 }
 
-log "NRV Mobile Worker запущен. Интервал: ${POLL_SECONDS}s"
+log "NRV Mobile Worker запущен. Интервал: ${POLL_SECONDS}s; таймаут задачи: ${TASK_TIMEOUT}s"
 while true; do
   issues_json="$(gh issue list --repo "$FACTORY_REPO" --state open --limit 50 --json number,title,body 2>>"$LOG_FILE" || echo '[]')"
   count="$(printf '%s' "$issues_json" | jq 'length' 2>/dev/null || echo 0)"
+  processed=0
   if [ "$count" -gt 0 ]; then
     i=0
     while [ "$i" -lt "$count" ]; do
@@ -218,11 +232,16 @@ while true; do
       body="$(printf '%s' "$item" | jq -r '.body // ""')"
       if printf '%s\n%s' "$title" "$body" | grep -Eq 'TASK_ID:|\[TASK\]'; then
         if printf '%s' "$body" | grep -Eq 'STATUS:[[:space:]]*(TODO|IN_PROGRESS|CHANGES_REQUESTED)'; then
-          run_task "$number" "$title" "$body"
+          run_task "$number" "$title" "$body" || true
+          processed=1
+          break
         fi
       fi
       i=$((i+1))
     done
+  fi
+  if [ "$processed" -eq 0 ]; then
+    log "Активных задач нет"
   fi
   sleep "$POLL_SECONDS"
 done
