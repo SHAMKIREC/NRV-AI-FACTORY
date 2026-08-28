@@ -9,9 +9,11 @@ REQUIREMENTS: Использовать единый React-controlled navigation 
 DO_NOT_CHANGE: production database; secrets/env; API contract; визуальный дизайн без необходимости; остальные страницы/порталы; force-push main.
 ACCEPTANCE_CRITERIA: Переход Dashboard → Trips и Trips → Dashboard работает без поиска кнопок через document.querySelector/button.click; существующий UI и рейсовый flow сохраняются; нет новой страницы или редизайна.
 TEST_REQUIREMENTS: npm test; npm run build. Если runtime недоступен — статическая проверка diff и явный REPORT с неисполненными тестами.
-STATUS: READY_FOR_REVIEW
+STATUS: DONE
+REVIEW_STATE: APPROVED
 WORK_BRANCH: factory/logix-002-navigation-shell
 PULL_REQUEST: SHAMKIREC/LOGIX#1
-CURRENT_PHASE: REVIEW_FIX_APPLIED
-HEAD_COMMIT: 781db9cb9bacac1d6a3d7cbafe2bfe5b47fc7485
-NEXT_ACTION: REVIEW_LOGIX_002_PR1_HEAD_781DB9C
+FINAL_HEAD: 781db9cb9bacac1d6a3d7cbafe2bfe5b47fc7485
+MERGE_COMMIT: fcc979bfc51c59bda047b0cb805f332f03d0acdc
+CURRENT_PHASE: COMPLETE
+NEXT_ACTION: LOGIX-003
