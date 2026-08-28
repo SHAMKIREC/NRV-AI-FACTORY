@@ -4,7 +4,7 @@ TASK_ID: LOGIX-002
 PROJECT: LOGIX
 TITLE: Стабилизация навигации Dashboard ↔ Trips
 OBJECTIVE: Убрать наиболее хрупкую DOM/querySelector-связку между главным дашбордом и разделом рейсов, сохранив текущий утверждённый внешний вид и функциональность.
-FILES_TO_INSPECT: src/main.jsx; src/App.jsx; src/DashboardOps.jsx; src/TripsPortal.jsx; связанные CSS-файлы только при необходимости.
+FILES_TO_INSPECT: src/main.jsx; src/App.jsx; src/DashboardOps.jsx; src/TripsPortal.jsx; src/DashboardReturnFix.jsx; связанные CSS-файлы только при необходимости.
 REQUIREMENTS: Использовать единый React-controlled navigation state/shell для переходов Dashboard ↔ Trips; не открывать разработку новых страниц; не ломать создание/просмотр рейса и возврат на дашборд; минимизировать diff.
 DO_NOT_CHANGE: production database; secrets/env; API contract; визуальный дизайн без необходимости; остальные страницы/порталы; force-push main.
 ACCEPTANCE_CRITERIA: Переход Dashboard → Trips и Trips → Dashboard работает без поиска кнопок через document.querySelector/button.click; существующий UI и рейсовый flow сохраняются; нет новой страницы или редизайна.
@@ -12,5 +12,6 @@ TEST_REQUIREMENTS: npm test; npm run build. Если runtime недоступе�
 STATUS: READY_FOR_REVIEW
 WORK_BRANCH: factory/logix-002-navigation-shell
 PULL_REQUEST: SHAMKIREC/LOGIX#1
-CURRENT_PHASE: REVIEWER_HANDOFF
-NEXT_ACTION: REVIEW_LOGIX_002_PR1
+CURRENT_PHASE: REVIEW_FIX_APPLIED
+HEAD_COMMIT: 781db9cb9bacac1d6a3d7cbafe2bfe5b47fc7485
+NEXT_ACTION: REVIEW_LOGIX_002_PR1_HEAD_781DB9C
