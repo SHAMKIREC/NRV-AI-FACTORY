@@ -2,7 +2,7 @@
 
 | Project | Status | Current task | Last completed | Next action | Blockers |
 |---|---|---|---|---|---|
-| LOGIX | ACTIVE | LOGIX-002 | LOGIX-001 | REVIEW_LOGIX_002_PR1 | NONE |
+| LOGIX | ACTIVE | LOGIX-002 | LOGIX-001 | REVIEW_LOGIX_002_PR1_HEAD_781DB9C | NONE |
 | DOKMARKET | NOT_STARTED | — | — | AUDIT | NONE |
 | RB | NOT_STARTED | — | — | AUDIT | NONE |
 | NRV-DIGITAL | NOT_STARTED | — | — | AUDIT | NONE |
