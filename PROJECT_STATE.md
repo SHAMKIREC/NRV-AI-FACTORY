@@ -2,7 +2,7 @@
 
 | Project | Status | Current task | Last completed | Next action | Blockers |
 |---|---|---|---|---|---|
-| LOGIX | ACTIVE | LOGIX-003 | LOGIX-002 | AUDIT_TRIP_MUTATION_AUTH_BOUNDARY | NONE |
+| LOGIX | BLOCKED | — | LOGIX-003 | AUTH_STRATEGY_DECISION | AUTH_PROVIDER_OR_IDENTITY_MODEL |
 | DOKMARKET | NOT_STARTED | — | — | AUDIT | NONE |
 | RB | NOT_STARTED | — | — | AUDIT | NONE |
 | NRV-DIGITAL | NOT_STARTED | — | — | AUDIT | NONE |
