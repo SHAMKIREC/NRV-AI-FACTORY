@@ -2,7 +2,7 @@
 
 | Project | Status | Current task | Last completed | Next action | Blockers |
 |---|---|---|---|---|---|
-| LOGIX | ACTIVE | LOGIX-002 | LOGIX-001 | CONSUME_CONTEXT_IN_APP_TRIPS_DASHBOARD | NONE |
+| LOGIX | ACTIVE | LOGIX-002 | LOGIX-001 | CONSUME_CONTEXT_IN_APP_TRIPS | NONE |
 | DOKMARKET | NOT_STARTED | — | — | AUDIT | NONE |
 | RB | NOT_STARTED | — | — | AUDIT | NONE |
 | NRV-DIGITAL | NOT_STARTED | — | — | AUDIT | NONE |
