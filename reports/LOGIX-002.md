@@ -9,15 +9,19 @@ REVIEW_STATE: NOT_READY_FOR_REVIEW
 
 - Re-read Manager Loop Issue #1, `PROJECT_STATE.md`, the active task and prior report.
 - Confirmed no new Manager `CHANGES_REQUESTED`; LOGIX-002 remains the active task.
-- Re-inspected the current fragile Dashboard ↔ Trips path in `App`, `TripsPortal`, and `DashboardOps`.
-- Advanced the existing React navigation foundation by wiring `NavigationProvider` at the single React root in `src/main.jsx`.
-- `App`, `DashboardOps`, `TripsPortal`, and the existing sibling portals now execute inside the same navigation context boundary without changing their visual output yet.
-- LOGIX branch remains `factory/logix-002-navigation-shell`.
+- Re-inspected the current Dashboard ↔ Trips navigation bridge.
+- Kept the shared `NavigationProvider` foundation already present at the root.
+- Updated `src/DashboardOps.jsx` on branch `factory/logix-002-navigation-shell` to consume `useNavigation()` directly.
+- Removed the DashboardOps helper chain that searched application buttons with `document.querySelectorAll(...).find(...).click()` and the polling loop that searched `.trip-row` before opening a trip.
+- DashboardOps actions now call React navigation actions directly: `openTrips()`, `openMap()` and `openTrip(id)`.
+- Existing DashboardOps rendering, trip data loading, map behavior and legacy metric synchronization were otherwise preserved.
 
 ## Commits
 
 - `e03aa50af4d75a1407ff9681bf9ec5fa3816e68c` — add `src/NavigationContext.jsx` foundation.
 - `e90c3082fca17e1f29f7bdd479f12e49317fd50c` — wire `NavigationProvider` at the application root.
+- `dab738483ad15a367664f610d987c00d4e5f49c0` — add explicit navigation actions.
+- `68fa7bbab6c53c6b71b09c8c5344168545754a7e` — consume React navigation context in DashboardOps and remove button-search/polling navigation there.
 
 ## Safety
 
@@ -30,14 +34,16 @@ REVIEW_STATE: NOT_READY_FOR_REVIEW
 
 ## Tests
 
-- Not run yet: this cycle only connected the provider boundary and did not replace the existing runtime navigation path.
+- Not run yet because LOGIX-002 is still incomplete and the remaining App/TripsPortal navigation path has not been converted.
 - `npm test` and `npm run build` remain required before Reviewer handoff.
 
 ## Current technical state
 
-- Shared React-controlled navigation state is now available to all root-level LOGIX components.
-- Legacy `TripsPortal` document-level navigation interception and `DashboardOps` querySelector/button.click/polling bridge are still present and must be removed before acceptance.
+- DashboardOps → Trips/Map/Trip detail intent is now expressed through the shared React navigation context instead of DOM button discovery.
+- `TripsPortal` still uses document-level click interception and local open/view state.
+- `App` still does not dispatch its Trips/Drivers/Dispatcher navigation through context.
+- Some non-navigation legacy DOM synchronization remains in DashboardOps; this was intentionally left untouched to keep this cycle narrowly scoped.
 
 ## Next safe action
 
-Consume `useNavigation()` in `App`, `TripsPortal`, and `DashboardOps`; route Dashboard → Trips/Map and Trips → Dashboard explicitly through context; remove the legacy document/querySelector/button.click bridge; then run `npm test` and `npm run build` and hand the complete diff to Reviewer.
+Consume `useNavigation()` in `App` and `TripsPortal`, make TripsPortal derive open/view/trip selection from shared navigation state, remove its document-level navigation interception, preserve trip creation/detail/back behavior, then run `npm test` and `npm run build` before Reviewer handoff.
