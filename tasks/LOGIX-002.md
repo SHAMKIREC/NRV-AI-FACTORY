@@ -11,5 +11,5 @@ ACCEPTANCE_CRITERIA: Переход Dashboard → Trips и Trips → Dashboard �
 TEST_REQUIREMENTS: npm test; npm run build. Если runtime недоступен — статическая проверка diff и явный REPORT с неисполненными тестами.
 STATUS: IN_PROGRESS
 WORK_BRANCH: factory/logix-002-navigation-shell
-CURRENT_PHASE: NAVIGATION_SECTION_HELPERS_READY
-NEXT_ACTION: CONSUME_CONTEXT_IN_APP_TRIPS
+CURRENT_PHASE: TRIPS_CONTEXT_CONSUMED
+NEXT_ACTION: CONSUME_CONTEXT_IN_APP
