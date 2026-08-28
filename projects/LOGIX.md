@@ -1,15 +1,15 @@
 # LOGIX
 
 - Repository: SHAMKIREC/LOGIX
-- Status: ACTIVE
-- Current task: LOGIX-003 — аудит доверительной границы API рейсов
-- Last completed: LOGIX-002 — стабилизация навигации Dashboard ↔ Trips
-- Next action: audit POST/PATCH authorization and fixed demo organization scope in `api/trips.js`
-- Blockers: none
+- Status: BLOCKED
+- Current task: none
+- Last completed: LOGIX-003 — аудит доверительной границы API рейсов
+- Next action: choose an authentication/identity strategy before protecting mutation APIs
+- Blockers: AUTH_PROVIDER_OR_IDENTITY_MODEL
 - Manager: AI Manager
 - Developer: ChatGPT / compatible coding agent
 - Reviewer: independent review pass
 
-Audit priority findings: Dashboard/Trips navigation shell is stabilized and merged. Before production SaaS usage add an explicit authentication/authorization boundary around mutation APIs; do not claim production security until an existing auth/session primitive is found and wired safely.
+Security audit result: `api/trips.js` has no caller authentication/authorization for POST/PATCH and scopes all data to a fixed `DEMO_ORG_ID`. No existing auth/session/JWT/cookie/Bearer/Supabase/Clerk/NextAuth primitive was found in the inspected repository. Do not invent a hidden shared secret or claim production security. A future code task requires a verified identity source plus organization-membership checks.
 
 Не считать сведения в этом файле актуальнее фактического состояния целевого репозитория.
