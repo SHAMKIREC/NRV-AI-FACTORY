@@ -14,6 +14,7 @@ REVIEW_STATE: NOT_READY_FOR_REVIEW
 - Updated `src/DashboardOps.jsx` on branch `factory/logix-002-navigation-shell` to consume `useNavigation()` directly.
 - Removed the DashboardOps helper chain that searched application buttons with `document.querySelectorAll(...).find(...).click()` and the polling loop that searched `.trip-row` before opening a trip.
 - DashboardOps actions now call React navigation actions directly: `openTrips()`, `openMap()` and `openTrip(id)`.
+- Extended `src/NavigationContext.jsx` with explicit section helpers `isDashboard`, `isTrips` and `openDashboard()` so App/TripsPortal can switch rendering from one shared React-controlled source of truth without introducing another DOM bridge.
 - Existing DashboardOps rendering, trip data loading, map behavior and legacy metric synchronization were otherwise preserved.
 
 ## Commits
@@ -22,6 +23,7 @@ REVIEW_STATE: NOT_READY_FOR_REVIEW
 - `e90c3082fca17e1f29f7bdd479f12e49317fd50c` — wire `NavigationProvider` at the application root.
 - `dab738483ad15a367664f610d987c00d4e5f49c0` — add explicit navigation actions.
 - `68fa7bbab6c53c6b71b09c8c5344168545754a7e` — consume React navigation context in DashboardOps and remove button-search/polling navigation there.
+- `4683dca1a67d3747573f8445f215a61a0ade077a` — expose shared section-state helpers for the remaining App/TripsPortal conversion.
 
 ## Safety
 
@@ -40,6 +42,7 @@ REVIEW_STATE: NOT_READY_FOR_REVIEW
 ## Current technical state
 
 - DashboardOps → Trips/Map/Trip detail intent is now expressed through the shared React navigation context instead of DOM button discovery.
+- NavigationContext now exposes section booleans and a dashboard action suitable for declarative rendering in App/TripsPortal.
 - `TripsPortal` still uses document-level click interception and local open/view state.
 - `App` still does not dispatch its Trips/Drivers/Dispatcher navigation through context.
 - Some non-navigation legacy DOM synchronization remains in DashboardOps; this was intentionally left untouched to keep this cycle narrowly scoped.
