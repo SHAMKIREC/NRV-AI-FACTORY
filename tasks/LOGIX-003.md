@@ -9,6 +9,7 @@ REQUIREMENTS: Сначала установить фактическое нал�
 DO_NOT_CHANGE: secrets/env; production database/data; API contract без отдельной необходимости; destructive migrations; пользовательский UI; force-push main.
 ACCEPTANCE_CRITERIA: Есть точный REPORT с текущей trust boundary POST/PATCH, используемым org scope, фактическими auth/authz checks или их отсутствием, рисками и безопасным следующим этапом; если существующий auth primitive найден — описан конкретный integration point; если не найден — задача не маскируется как production-secure.
 TEST_REQUIREMENTS: Для audit-only этапа код не меняется; статическая проверка исходников достаточна. Если после аудита будет создан отдельный code-step, его тесты задаются отдельно.
-STATUS: READY
-CURRENT_PHASE: SECURITY_AUDIT
-NEXT_ACTION: AUDIT_TRIP_MUTATION_AUTH_BOUNDARY
+STATUS: DONE
+REVIEW_STATE: APPROVED
+CURRENT_PHASE: COMPLETE
+NEXT_ACTION: AUTH_STRATEGY_DECISION
