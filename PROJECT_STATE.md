@@ -2,7 +2,7 @@
 
 | Project | Status | Current task | Last completed | Next action | Blockers |
 |---|---|---|---|---|---|
-| LOGIX | ACTIVE | LOGIX-002 | LOGIX-001 | VERIFY_FINAL_DIFF_AND_TESTS | NONE |
+| LOGIX | ACTIVE | LOGIX-002 | LOGIX-001 | REVIEW_LOGIX_002_PR1 | NONE |
 | DOKMARKET | NOT_STARTED | — | — | AUDIT | NONE |
 | RB | NOT_STARTED | — | — | AUDIT | NONE |
 | NRV-DIGITAL | NOT_STARTED | — | — | AUDIT | NONE |
