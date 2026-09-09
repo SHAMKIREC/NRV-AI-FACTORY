@@ -4,7 +4,6 @@
 |---|---|---|---|---|---|
 | LOGIX | BLOCKED | — | LOGIX-003 | AUTH_STRATEGY_DECISION | AUTH_PROVIDER_OR_IDENTITY_MODEL |
 | DOKMARKET | NOT_STARTED | — | — | AUDIT | NONE |
-| RB | NOT_STARTED | — | — | AUDIT | NONE |
 | NRV-DIGITAL | NOT_STARTED | — | — | AUDIT | NONE |
 
 ## State rules
@@ -13,3 +12,4 @@
 - Состояние обновляется после подтверждённого review.
 - Процент готовности не выдумывается без измеримого плана.
 - PROJECT_COMPLETE разрешён только после финального аудита Reviewer.
+- RB намеренно исключён из Factory и не должен появляться здесь снова без отдельного решения владельца.
