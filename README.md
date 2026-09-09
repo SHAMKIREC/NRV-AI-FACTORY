@@ -6,9 +6,11 @@
 
 GitHub является общей памятью. Manager ставит задачу, Developer выполняет работу в целевом репозитории, Reviewer проверяет результат. Состояние сохраняется в задачах, отчётах и PROJECT_STATE.md.
 
+**NRV-TOOLKIT — источник правил и стандартов. NRV-AI-FACTORY — механизм, который применяет эти правила к конкретному проекту.**
+
 ## Цикл
 
-`MANAGER → TASK → DEVELOPER → REPORT → REVIEWER → DONE/CHANGES_REQUESTED → NEXT TASK`
+`MANAGER → TASK → TOOLKIT RULES → DEVELOPER → TESTS → REPORT → REVIEWER → DONE/CHANGES_REQUESTED → NEXT TASK`
 
 Цикл заканчивается только после финального аудита и статуса `PROJECT_COMPLETE`.
 
@@ -20,16 +22,26 @@ GitHub является общей памятью. Manager ставит зада
 
 ## Исключённые проекты
 
-- RB — не подключать к AI Factory и не изменять через автоматический цикл. Проект дорабатывается владельцем отдельно.
+- RB — не подключать к AI Factory, не создавать для него TASK и не изменять через автоматический цикл. Проект дорабатывается владельцем отдельно.
 
 Исходный код проектов сюда не копируется. Этот репозиторий хранит только правила, состояние, задачи и отчёты.
+
+## Как работает связка с NRV-TOOLKIT
+
+1. Manager выбирает проект.
+2. Выбирает профиль из `QUALITY_PROFILES.md`.
+3. В TASK указывает, какие правила NRV-TOOLKIT применяются.
+4. Developer меняет только целевой проект.
+5. Выполняет обязательные проверки из профиля.
+6. Reviewer сверяет результат с acceptance criteria и правилами TOOLKIT.
+7. Только после APPROVED задача становится DONE.
 
 ## Как начать проект
 
 1. Добавить или обновить `projects/<PROJECT>.md`.
 2. Manager создаёт первую задачу по `TASK_PROTOCOL.md`.
 3. Developer меняет только целевой репозиторий и публикует отчёт по `REPORT_PROTOCOL.md`.
-4. Reviewer проверяет acceptance criteria и регрессии.
+4. Reviewer проверяет acceptance criteria, применимые правила TOOLKIT и регрессии.
 5. Manager обновляет `PROJECT_STATE.md` и выдаёт следующую задачу.
 
 ## Безопасность
