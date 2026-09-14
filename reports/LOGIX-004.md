@@ -32,6 +32,17 @@ QUALITY_PROFILE: BUSINESS_APP
 - Vercel production deployment `dpl_HGRjRsgomDHgN3ubqp8hUomSozaL` for the same E2E commit is READY.
 - Production `/api/health` verified HTTP 200 after this cycle with `ok=true`, `database=ok`, `authMode=demo`, preserving owner developer access.
 - Vercel runtime review found no new app failure cluster from this slice; the only grouped warning is the existing Node `DEP0169 url.parse()` deprecation seen on `/api/trips` and `/api/documents`, likely from a dependency path and not yet attributed to first-party LOGIX code.
+- EPD/UKEP readiness is now implemented server-side inside the existing tenant-scoped `/api/documents` route in commit `497bb5ef33dcac6d993c096abc46bf6e6a4c3304`, avoiding a 13th Vercel function on Hobby. The response exposes only readiness metadata: `provider=gis-epd`, configuration state, `readyForConnection`, `connectionTested`, operator/signature flags, capabilities and `requiredConfiguration`.
+- Production `/api/documents` was verified HTTP 200 after the backend deployment and currently reports `status=not_configured`, `readyForConnection=true`, `connectionTested=false`, `operator.configured=false`, `signature.configured=false`, `privateKeyStoredInLogix=false`, `localDrafts=true`, while `legalExchange`, `signing` and `sendToGisEpd` remain false. Required setup currently includes operator, base URL, auth mode, credentials, signature mode and document mapping.
+- EPD provider credentials and signing key material remain server-only. `test/epdReadinessContracts.test.js` added in commit `cbe379dffc24eb568520685417ba60241703b88e` asserts that the API does not return token/client-secret values, the frontend does not read EPD secrets, LOGIX does not store the private signing key, and legal exchange/signing remain disabled before a real provider verification.
+- `src/DocumentsPortal.jsx` was updated in commit `002f4b073e7df00552d64d5706ef8ef9c25d7517` so the EPD settings panel consumes server readiness instead of relying on a purely static integration state. It is designed to show operator/signature state, safe mode, connection-test state and remaining setup requirements without enabling a fake send/sign action.
+- `LOGIX/TASKS.md` was advanced in commit `a28cea18fa54a70dbcc33b5216d34278f22e58ef`: EPD readiness is recorded as completed internal contour work and billing/tariff readiness is now the next safe internal integration task.
+- GitHub Actions `LOGIX Quality` run 221 for head `a28cea18fa54a70dbcc33b5216d34278f22e58ef` completed successfully. Dependency install, `npm test`, `npm run build`, Chromium setup and Browser smoke QA all passed.
+- Production `/api/health` remains HTTP 200 with `database=ok` and `authMode=demo`, so the owner developer bypass is preserved.
+- Vercel deployment `dpl_6HDT8yHAkfqRve76Vi8c6w4471xa` for backend commit `497bb5ef33dcac6d993c096abc46bf6e6a4c3304` is READY and reports 12 Node serverless functions, staying at the Hobby function cap without exceeding it.
+- Live non-destructive browser QA of the currently deployed EPD/ETRN settings screen passed visually on narrow/mobile layout: no overlap, clipping or broken controls. Because Vercel has not yet deployed the later frontend readiness commit, this QA is treated only as a regression check of the currently live static panel, not as proof of the new readiness UI.
+- GitHub Vercel status for newest head `a28cea18fa54a70dbcc33b5216d34278f22e58ef` currently reports a transient `build-rate-limit` failure. The production alias therefore still points to backend deployment `497bb5...`; the new frontend readiness UI requires an automatic deploy retry followed by exact live QA when the rate limit clears. This is not an owner-action blocker.
+- No Neon migration, destructive database mutation, user-data deletion, secret rotation, external-provider credential change or mandatory-auth switch was performed during the EPD readiness cycle.
 
 ## Remaining findings
 
@@ -54,6 +65,7 @@ P2 / backend hardening:
 
 P2 / frontend / QA:
 - Non-destructive production smoke now covers existing-trip open, visible status action, embedded documents and transition into the documents portal on desktop, plus mobile shell overflow/overlap. Full mutation E2E (`create trip -> status transition`) remains intentionally excluded until the synthetic test-data strategy is confirmed.
+- The EPD readiness frontend code is merged and CI-green, but exact production UI verification must be repeated after Vercel clears the transient build-rate limit and deploys the newest head.
 - Mobile/dashboard CSS is still fragmented across multiple override files and should be consolidated with regression QA rather than by blind deletion.
 
 P2 / operations:
@@ -61,12 +73,13 @@ P2 / operations:
 
 P2 / integration completeness:
 - 1C readiness contour exists, but real 1C remains unconnected pending concrete endpoint/auth/mapping parameters from the owner or target customer.
-- Accredited IS EPD/ETRN operator, UKEP and tariff/payment integrations remain explicit unconnected states and must not be simulated.
+- Internal IS EPD/UKEP readiness is now present and truthful; real legal exchange still requires a chosen accredited operator, contract/API parameters, signature mode and mapping. No external integration has been simulated.
+- Tariff/payment readiness remains to be prepared without inventing prices or a payment provider.
 
 ## Reviewer decision
 
-Current auth hardening, tenant-scope contracts, atomic trip numbering, atomic auth bootstrap, bounded auth-provider access, idempotency design, CI/build, UI/mobile regression, expanded non-destructive trip-detail browser QA, production deployment/health, and 1C readiness contour pass the verified gates above. LOGIX-004 remains IN_PROGRESS. No PROJECT_COMPLETE or 95%-ready claim is allowed yet because real user-auth/two-tenant E2E, data-hygiene confirmation, remaining frontend/operations hardening and several production integrations are still outstanding.
+Current auth hardening, tenant-scope contracts, atomic trip numbering, atomic auth bootstrap, bounded auth-provider access, idempotency design, CI/build, UI/mobile regression, expanded non-destructive trip-detail browser QA, production deployment/health, 1C readiness contour, and server-side EPD/UKEP readiness pass the verified gates above. LOGIX-004 remains IN_PROGRESS. The EPD frontend slice is CI-green but still awaits production deployment because of a transient Vercel build-rate limit; this is an automatic retry item, not an owner blocker. No PROJECT_COMPLETE or 95%-ready claim is allowed yet because real user-auth/two-tenant E2E, data-hygiene confirmation, remaining frontend/operations hardening and several production integrations are still outstanding.
 
 ## Next action
 
-Continue safe work without owner interruption: strengthen non-destructive authorization contracts without inventing an unapproved role matrix, review request/body abuse limits and business-API failure handling, consolidate CSS/override architecture with regression protection, and continue production/API smoke checks. Keep migration 006 prepared-only. Request owner input only when a production schema migration must be applied, destructive/sensitive data action is required, mandatory auth would affect developer access, or the product reaches the agreed near-finish threshold.
+Retry the newest LOGIX head deployment after the transient Vercel build-rate limit clears, then run exact live QA of the server-driven EPD settings state. After that, continue with the next safe internal item: billing/tariff readiness without invented prices or payment success states. Keep developer/demo bypass intact and migration 006 prepared-only. Request owner input only when a production schema migration must be applied, destructive/sensitive data action is required, mandatory auth would affect developer access, an external provider must actually be selected/configured, or the product reaches the agreed near-finish threshold.
