@@ -26,6 +26,12 @@ QUALITY_PROFILE: BUSINESS_APP
 - Production `/api/health` after that deployment returned HTTP 200 with `ok=true`, `service=logix`, `database=ok`, `authMode=demo`; owner developer bypass remains intact.
 - Deployment-scoped Vercel runtime error/fatal logs for the new head were empty in the checked window.
 - No production migration, destructive SQL, data deletion, secret rotation or mandatory-auth switch was performed in this slice.
+- A server-side 1C readiness endpoint `/api/integration-1c` is live. It exposes only tenant-scoped readiness metadata/counts, reports `not_configured` until real parameters exist, and does not simulate sync or expose credentials. Production response verified HTTP 200 with 1 trip, 5 drivers and 5 vehicles in the current demo tenant.
+- Production Playwright smoke was expanded in commit `53c58f5aa554dd2bcb0e207299ab613b75e9bd4b` to cover `dashboard → trips → existing trip → status controls → embedded documents → documents portal` without clicking the status mutation action or writing production data.
+- GitHub Actions `LOGIX Quality` run 201 for `53c58f5aa554dd2bcb0e207299ab613b75e9bd4b` completed successfully: `npm test`, `npm run build`, Chromium install and Browser smoke QA all passed.
+- Vercel production deployment `dpl_HGRjRsgomDHgN3ubqp8hUomSozaL` for the same E2E commit is READY.
+- Production `/api/health` verified HTTP 200 after this cycle with `ok=true`, `database=ok`, `authMode=demo`, preserving owner developer access.
+- Vercel runtime review found no new app failure cluster from this slice; the only grouped warning is the existing Node `DEP0169 url.parse()` deprecation seen on `/api/trips` and `/api/documents`, likely from a dependency path and not yet attributed to first-party LOGIX code.
 
 ## Remaining findings
 
@@ -47,18 +53,19 @@ P2 / backend hardening:
 - Role codes are resolved into request context, but a final business-role permission matrix is not yet frozen; do not invent restrictive RBAC rules that could lock out valid workflows or the owner.
 
 P2 / frontend / QA:
-- Non-destructive production smoke coverage passes, but full mutation E2E (`create trip -> status transition`) remains intentionally excluded until the test-data strategy is confirmed.
+- Non-destructive production smoke now covers existing-trip open, visible status action, embedded documents and transition into the documents portal on desktop, plus mobile shell overflow/overlap. Full mutation E2E (`create trip -> status transition`) remains intentionally excluded until the synthetic test-data strategy is confirmed.
 - Mobile/dashboard CSS is still fragmented across multiple override files and should be consolidated with regression QA rather than by blind deletion.
 
 P2 / operations:
 - Backup/restore policy, access-audit procedure and recovery drill remain incomplete for commercial production readiness.
 
 P2 / integration completeness:
-- 1C, accredited IS EPD/ETRN operator, UKEP and tariff/payment integrations remain explicit unconnected states and must not be simulated.
+- 1C readiness contour exists, but real 1C remains unconnected pending concrete endpoint/auth/mapping parameters from the owner or target customer.
+- Accredited IS EPD/ETRN operator, UKEP and tariff/payment integrations remain explicit unconnected states and must not be simulated.
 
 ## Reviewer decision
 
-Current auth hardening, tenant-scope contracts, atomic trip numbering, atomic auth bootstrap, bounded auth-provider access, idempotency design, CI/build, UI/mobile regression and production smoke checks pass the verified gates above. LOGIX-004 remains IN_PROGRESS. No PROJECT_COMPLETE or 95%-ready claim is allowed yet because real user-auth/two-tenant E2E, data-hygiene confirmation, remaining frontend/operations hardening and several production integrations are still outstanding.
+Current auth hardening, tenant-scope contracts, atomic trip numbering, atomic auth bootstrap, bounded auth-provider access, idempotency design, CI/build, UI/mobile regression, expanded non-destructive trip-detail browser QA, production deployment/health, and 1C readiness contour pass the verified gates above. LOGIX-004 remains IN_PROGRESS. No PROJECT_COMPLETE or 95%-ready claim is allowed yet because real user-auth/two-tenant E2E, data-hygiene confirmation, remaining frontend/operations hardening and several production integrations are still outstanding.
 
 ## Next action
 
