@@ -18,10 +18,14 @@ QUALITY_PROFILE: BUSINESS_APP
 - Idempotency schema contract tests were added on main; rollout remains gated by isolated-branch validation and owner approval before any production migration.
 - First-user auth bootstrap was changed from separate organization/user inserts to one atomic data-modifying CTE so a failed/racing user insert cannot leave a separately committed orphan organization (`3968f1e0179b91013bd97a7d30d4d9fc3800886f`).
 - `test/authBootstrapAtomicity.test.js` guards the atomic bootstrap, trusted-origin requirement and server-side auth-user ownership (`81175afcd61c03a8a8d80bcea4e46fbb28cc379d`).
-- GitHub Actions `LOGIX Quality` run 182 completed successfully on `81175afcd61c03a8a8d80bcea4e46fbb28cc379d`: install, npm test and npm run build all passed.
-- Vercel deployment `dpl_33tg9iTSdDSKgUBR8sZmvnNKpz1A` for `81175afcd61c03a8a8d80bcea4e46fbb28cc379d` is READY and owns production alias `logix-indol.vercel.app`.
-- Production `/api/health` returns HTTP 200 with `database: ok`; developer mode remains explicit as `authMode: demo`.
-- Vercel production error/fatal runtime logs for the checked previous-hour window were empty.
+- Current LOGIX main head for this review slice is `555a3c8e0304492a804be7749a197bb57897faf0`, which includes the atomic auth-bootstrap hardening plus the prepared idempotency contract and synchronized `TASKS.md`.
+- GitHub Actions `LOGIX Quality` run 183 for `555a3c8e0304492a804be7749a197bb57897faf0` completed successfully: dependency install, `npm test` and `npm run build` all passed.
+- Vercel status for `555a3c8e0304492a804be7749a197bb57897faf0` reports success.
+- Fresh non-destructive live production smoke QA after that deployment passed with no defects in the tested desktop scenario: Dashboard, Trips, Documents, Counterparties, Fleet, Drivers and Finance all opened; there was no horizontal overflow; existing trip `LGX-000001` opened with route/driver/vehicle details; its Documents section and Documents navigation worked.
+- That smoke pass made no business mutations: no data was created, edited, deleted, signed, submitted or status-changed.
+- During the fresh smoke pass production `/api/health` returned `ok=true`, `service=logix`, `database=ok`, `authMode=demo`, `latencyMs=14`, timestamp `2026-09-14T20:42:46.769Z`.
+- Read-only Neon inspection confirmed the current `audit_logs` column contract; no destructive SQL or migration was executed.
+- Vercel production error/fatal runtime logs for the previously checked window were empty.
 
 ## Remaining findings
 
@@ -40,13 +44,20 @@ P2 / backend hardening:
 - Document-create idempotency is partially protected by its existing unique `(organization_id, trip_id, type)` constraint but does not yet expose a general Idempotency-Key contract.
 - Address-suggest burst limiting remains instance-local; distributed limiting is needed before public scale.
 
+P2 / frontend / QA:
+- Non-destructive production smoke coverage passes, but full mutation E2E (`create trip -> status transition`) remains intentionally excluded until the test-data strategy is confirmed.
+- Mobile/dashboard CSS is still fragmented across multiple override files and should be consolidated with regression QA rather than by blind deletion.
+
+P2 / operations:
+- Backup/restore policy, access-audit procedure and recovery drill remain incomplete for commercial production readiness.
+
 P2 / integration completeness:
 - 1C, accredited IS EPD/ETRN operator, UKEP and tariff/payment integrations remain explicit unconnected states and must not be simulated.
 
 ## Reviewer decision
 
-Current auth hardening, tenant-scope contracts, atomic trip numbering, atomic auth bootstrap, UI/mobile regression and production deployment checks pass the verified gates above. LOGIX-004 remains IN_PROGRESS. No PROJECT_COMPLETE or 95%-ready claim is allowed yet because real user-auth/two-tenant E2E and several production integrations are still outstanding.
+Current auth hardening, tenant-scope contracts, atomic trip numbering, atomic auth bootstrap, idempotency design, CI/build, UI/mobile regression and fresh production smoke checks pass the verified gates above. LOGIX-004 remains IN_PROGRESS. No PROJECT_COMPLETE or 95%-ready claim is allowed yet because real user-auth/two-tenant E2E, data-hygiene confirmation, remaining frontend/operations hardening and several production integrations are still outstanding.
 
 ## Next action
 
-Continue safe work without owner interruption: inspect role enforcement and tenant-scoped business APIs, strengthen non-destructive auth/authorization tests, and review runtime/dependency/security findings. Keep migration 006 prepared-only. Request owner input only when a production schema migration must be applied, destructive/sensitive data action is required, mandatory auth would affect developer access, or the product reaches the agreed near-finish threshold.
+Continue safe work without owner interruption: inspect role enforcement and tenant-scoped business APIs, strengthen non-destructive auth/authorization tests, consolidate CSS/override architecture with regression protection, and continue production/API smoke checks. Keep migration 006 prepared-only. Request owner input only when a production schema migration must be applied, destructive/sensitive data action is required, mandatory auth would affect developer access, or the product reaches the agreed near-finish threshold.
