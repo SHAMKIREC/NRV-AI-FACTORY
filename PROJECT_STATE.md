@@ -3,7 +3,7 @@
 | Project | Status | Current task | Last completed | Next action | Blockers |
 |---|---|---|---|---|---|
 | NRV-DIGITAL | PAUSED | — | NRV-001 partial | — | OWNER_FOCUS_LOGIX_ONLY |
-| LOGIX | IN_PROGRESS | LOGIX-004 | INN_PARTY_VERIFICATION + LIVE_QA | CONTINUE_BUSINESS_APP_GATES | EXTERNAL_PROVIDERS_ONLY |
+| LOGIX | IN_PROGRESS | LOGIX-004 | EPD_READINESS_BACKEND + CI | RETRY_EPD_UI_PRODUCTION_DEPLOY_THEN_LIVE_QA | VERCEL_BUILD_RATE_LIMIT_TRANSIENT + EXTERNAL_PROVIDERS_ONLY |
 | DOKMARKET | PAUSED | — | — | — | OWNER_FOCUS_LOGIX_ONLY |
 | SAYGO by NRV | PAUSED | SAYGO-002 | — | — | OWNER_FOCUS_LOGIX_ONLY |
 
@@ -23,7 +23,12 @@
 - ИНН грузоотправителя `7707083893` и грузополучателя `7736207543` успешно разрешаются production endpoint `/api/party-suggest` через DaData.
 - Legacy `/api/company-by-inn` безопасно переписывается на общий lookup без добавления 13-й serverless function; Vercel production остаётся в Hobby limit: 12 functions.
 - Live browser QA открыл `LGX-000002` без мутаций и подтвердил отображение обеих компаний в карточке рейса, отсутствие overlap/broken controls.
-- GitHub Actions `LOGIX Quality` run 217 для head `5eb13de12cc668893e71be2ecb1949c6035a4019` завершён SUCCESS.
+- ИС ЭПД/УКЭП readiness добавлен в существующий `/api/documents` без новой serverless function. Production API уже отвечает `provider=gis-epd`, `status=not_configured`, `readyForConnection=true`, `connectionTested=false`, `privateKeyStoredInLogix=false`; подпись/юридически значимая отправка остаются выключены.
+- EPD security regression покрывает server-only credentials/key boundary; frontend не читает EPD secrets.
+- GitHub Actions latest LOGIX Quality для head `a28cea18fa54a70dbcc33b5216d34278f22e58ef` прошёл tests, build и Browser smoke QA успешно.
+- Production `/api/health` отвечает HTTP 200: database=ok, authMode=demo; developer bypass сохранён.
+- UI-код реального EPD readiness готов в main, но текущий Vercel production alias ещё указывает на deployment `497bb5ef33dcac6d993c096abc46bf6e6a4c3304`. GitHub Vercel status для нового head сообщает transient `build-rate-limit`; повторный deploy/QA требуется после снятия лимита.
+- Никаких миграций, destructive DB changes, удаления данных, ротации секретов или mandatory-auth switch не выполнялось.
 
 ## State rules
 
