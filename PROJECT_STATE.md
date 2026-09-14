@@ -2,17 +2,18 @@
 
 | Project | Status | Current task | Last completed | Next action | Blockers |
 |---|---|---|---|---|---|
-| NRV-DIGITAL | IN_PROGRESS | NRV-001 | — | FULL_FACTORY_AUDIT | NONE |
-| LOGIX | PAUSED | — | LOGIX-003 | — | OWNER_FOCUS_NRV_ONLY |
-| DOKMARKET | PAUSED | — | — | — | OWNER_FOCUS_NRV_ONLY |
-| SAYGO by NRV | PAUSED | SAYGO-002 | — | — | OWNER_FOCUS_NRV_ONLY |
+| NRV-DIGITAL | PAUSED | — | — | — | OWNER_FOCUS_LOGIX_ONLY |
+| LOGIX | IN_PROGRESS | LOGIX-004 | LOGIX-003 | FULL_AUDIT_AUTOFIX_VERIFY | NONE |
+| DOKMARKET | PAUSED | — | — | — | OWNER_FOCUS_LOGIX_ONLY |
+| SAYGO by NRV | PAUSED | SAYGO-002 | — | — | OWNER_FOCUS_LOGIX_ONLY |
 
 ## Active owner directive
 
-- Единственный активный продукт сейчас: **NRV-DIGITAL**.
-- Factory не начинает и не продолжает работу над LOGIX, DOKMARKET, SAYGO или другими продуктами, пока владелец явно не сменит фокус.
-- NRV-001 = полный аудит продукта всеми релевантными ресурсами Factory с последующим циклом исправление → review → live QA → regression.
-- ClickUp используется как внешний диспетчер найденных задач; GitHub и NRV-AI-FACTORY остаются источником правил, кода, состояния и доказательств проверки.
+- Единственный активный продукт сейчас: **LOGIX**.
+- Factory не начинает и не продолжает работу над NRV-DIGITAL, DOKMARKET, SAYGO или другими продуктами, пока владелец явно не сменит фокус.
+- LOGIX-004 = полный прогон продукта через NRV Center + ECC по профилю BUSINESS_APP: аудит → autofix → review → live QA → regression.
+- Developer workspace владельца остаётся доступным без обязательной регистрации; demo/dev доступ нельзя выдавать за production authorization.
+- GitHub и NRV-AI-FACTORY остаются источником правил, кода, состояния и доказательств проверки.
 
 ## State rules
 
