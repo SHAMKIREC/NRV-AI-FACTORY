@@ -3,17 +3,18 @@
 | Project | Status | Current task | Last completed | Next action | Blockers |
 |---|---|---|---|---|---|
 | NRV-DIGITAL | IN_PROGRESS | NRV-001 | — | FULL_AUDIT_AUTOFIX_VERIFY | NONE |
-| LOGIX | PAUSED | — | LOGIX-003 | — | OWNER_FOCUS_NRV_ONLY |
+| LOGIX | IN_PROGRESS | LOGIX-004 | LOGIX-003 | BUSINESS_APP_SAFE_AUTOFIX_VERIFY | EXTERNAL_INTEGRATIONS_OWNER_INPUT_LATER |
 | DOKMARKET | PAUSED | — | — | — | OWNER_FOCUS_NRV_ONLY |
 | SAYGO by NRV | PAUSED | SAYGO-002 | — | — | OWNER_FOCUS_NRV_ONLY |
 
 ## Active owner directive
 
-- Единственный активный продукт сейчас: **NRV-DIGITAL**.
-- Factory не начинает и не продолжает работу над LOGIX, DOKMARKET, SAYGO или другими продуктами, пока владелец явно не сменит фокус.
-- NRV-001 = полный прогон NRV-DIGITAL через NRV Center + ECC по профилю SHOWCASE_WEB: repository audit → UI/UX audit → autofix → review → live QA → regression → deploy verification.
-- Обязательный охват: каждая публичная страница, header/footer, mobile/desktop, typography, spacing, cards, motion, shadows, hover/touch states, links/buttons/forms, accessibility, SEO, performance basics, visual regression и production smoke test.
-- Пользовательские скриншоты считаются входом для дефектов и должны быть сопоставлены с live production.
+- Для текущего Factory-цикла разрешено автономно продолжать **LOGIX** по `LOGIX-004` вместе с NRV-AI-FACTORY state/report файлами, относящимися к LOGIX.
+- Не трогать другие продуктовые репозитории.
+- Для LOGIX разрешены только безопасные non-destructive изменения: audit → autofix → tests/build → Vercel/health → live browser QA → report state.
+- Developer/demo bypass владельца сохраняется; обязательный user auth не включать без отдельного решения.
+- Не применять Neon migrations, не удалять данные, не ротировать secrets и не выполнять destructive DB actions без явного подтверждения владельца.
+- NRV-001 остаётся отдельной задачей NRV-DIGITAL и этим LOGIX-циклом не изменяется.
 - GitHub и NRV-AI-FACTORY остаются источником правил, кода, состояния и доказательств проверки.
 
 ## State rules
