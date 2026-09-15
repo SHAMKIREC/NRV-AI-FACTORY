@@ -3,7 +3,7 @@
 | Project | Status | Current task | Last completed | Next action | Blockers |
 |---|---|---|---|---|---|
 | NRV-DIGITAL | PAUSED | — | NRV-001 partial | — | OWNER_FOCUS_LOGIX_ONLY |
-| LOGIX | IN_PROGRESS | LOGIX-004 | EPD_READINESS_BACKEND + CI | RETRY_EPD_UI_PRODUCTION_DEPLOY_THEN_LIVE_QA | VERCEL_BUILD_RATE_LIMIT_TRANSIENT + EXTERNAL_PROVIDERS_ONLY |
+| LOGIX | IN_PROGRESS | LOGIX-004 | EPD_READINESS_BACKEND + CI | VERIFY_BILLING_READINESS_CI_DEPLOY_PRODUCTION | EXTERNAL_PROVIDERS_ONLY |
 | DOKMARKET | PAUSED | — | — | — | OWNER_FOCUS_LOGIX_ONLY |
 | SAYGO by NRV | PAUSED | SAYGO-002 | — | — | OWNER_FOCUS_LOGIX_ONLY |
 
@@ -23,11 +23,10 @@
 - ИНН грузоотправителя `7707083893` и грузополучателя `7736207543` успешно разрешаются production endpoint `/api/party-suggest` через DaData.
 - Legacy `/api/company-by-inn` безопасно переписывается на общий lookup без добавления 13-й serverless function; Vercel production остаётся в Hobby limit: 12 functions.
 - Live browser QA открыл `LGX-000002` без мутаций и подтвердил отображение обеих компаний в карточке рейса, отсутствие overlap/broken controls.
-- ИС ЭПД/УКЭП readiness добавлен в существующий `/api/documents` без новой serverless function. Production API уже отвечает `provider=gis-epd`, `status=not_configured`, `readyForConnection=true`, `connectionTested=false`, `privateKeyStoredInLogix=false`; подпись/юридически значимая отправка остаются выключены.
-- EPD security regression покрывает server-only credentials/key boundary; frontend не читает EPD secrets.
-- GitHub Actions latest LOGIX Quality для head `a28cea18fa54a70dbcc33b5216d34278f22e58ef` прошёл tests, build и Browser smoke QA успешно.
+- ИС ЭПД/УКЭП readiness добавлен в существующий `/api/documents` без новой serverless function. Production API отвечает `provider=gis-epd`, `status=not_configured`, `readyForConnection=true`, `connectionTested=false`, `privateKeyStoredInLogix=false`; подпись/юридически значимая отправка выключены.
 - Production `/api/health` отвечает HTTP 200: database=ok, authMode=demo; developer bypass сохранён.
-- UI-код реального EPD readiness готов в main, но текущий Vercel production alias ещё указывает на deployment `497bb5ef33dcac6d993c096abc46bf6e6a4c3304`. GitHub Vercel status для нового head сообщает transient `build-rate-limit`; повторный deploy/QA требуется после снятия лимита.
+- Vercel production deployment для EPD backend находится в READY; production `/api/documents` подтверждает безопасный readiness-контракт.
+- Billing/tariff readiness добавлен в существующий tenant-scoped `/api/catalog` без новой Vercel Function и без фиктивных цен/оплат: тарифы, счета, платежи и automatic charges остаются disabled до утверждения commercial terms. Regression contract добавлен; CI/deploy verification выполняется следующим шагом.
 - Никаких миграций, destructive DB changes, удаления данных, ротации секретов или mandatory-auth switch не выполнялось.
 
 ## State rules
