@@ -3,7 +3,7 @@
 | Project | Status | Current task | Last completed | Next action | Blockers |
 |---|---|---|---|---|---|
 | NRV-DIGITAL | PAUSED | — | NRV-001 partial | — | OWNER_FOCUS_LOGIX_ONLY |
-| LOGIX | IN_PROGRESS | LOGIX-004 | EPD_READINESS_BACKEND + CI | VERIFY_BILLING_READINESS_CI_DEPLOY_PRODUCTION | EXTERNAL_PROVIDERS_ONLY |
+| LOGIX | IN_PROGRESS | LOGIX-004 | BILLING_READINESS_BACKEND + PRODUCTION_API | VERIFY_BILLING_UI_CI_DEPLOY_LIVE_QA | EXTERNAL_PROVIDERS_ONLY |
 | DOKMARKET | PAUSED | — | — | — | OWNER_FOCUS_LOGIX_ONLY |
 | SAYGO by NRV | PAUSED | SAYGO-002 | — | — | OWNER_FOCUS_LOGIX_ONLY |
 
@@ -25,8 +25,8 @@
 - Live browser QA открыл `LGX-000002` без мутаций и подтвердил отображение обеих компаний в карточке рейса, отсутствие overlap/broken controls.
 - ИС ЭПД/УКЭП readiness добавлен в существующий `/api/documents` без новой serverless function. Production API отвечает `provider=gis-epd`, `status=not_configured`, `readyForConnection=true`, `connectionTested=false`, `privateKeyStoredInLogix=false`; подпись/юридически значимая отправка выключены.
 - Production `/api/health` отвечает HTTP 200: database=ok, authMode=demo; developer bypass сохранён.
-- Vercel production deployment для EPD backend находится в READY; production `/api/documents` подтверждает безопасный readiness-контракт.
-- Billing/tariff readiness добавлен в существующий tenant-scoped `/api/catalog` без новой Vercel Function и без фиктивных цен/оплат: тарифы, счета, платежи и automatic charges остаются disabled до утверждения commercial terms. Regression contract добавлен; CI/deploy verification выполняется следующим шагом.
+- Billing/tariff readiness работает через существующий tenant-scoped `/api/catalog` без новой Vercel Function. Production API подтверждает `status=not_configured`, `readyForConnection=true`, provider/pricing unset, `tripTariffs=false`, `invoices=false`, `payments=false`, `automaticCharges=false`, `commercialTermsApproved=false`; фиктивные цены и движение денег не включены.
+- Finance UI обновлён для чтения `billingReadiness` из `/api/catalog` и показа реальных требований подключения вместо фиктивной оплаты; regression contract добавлен. Финальная CI/deploy/live QA проверка этого UI ещё выполняется.
 - Никаких миграций, destructive DB changes, удаления данных, ротации секретов или mandatory-auth switch не выполнялось.
 
 ## State rules
