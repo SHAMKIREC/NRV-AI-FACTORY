@@ -29,13 +29,19 @@ ACCEPTANCE_CRITERIA:
 TEST_REQUIREMENTS: npm test; npm run build; API smoke; Vercel deploy check; security negative-case review; mobile/visual review доступными средствами; diff review.
 STATUS: IN_PROGRESS
 
-## Current cycle checkpoint — production browser hardening
+## Current cycle checkpoint — Center + live verification
 
-- BUSINESS_APP security review found that application/API responses did not have a centralized browser-header baseline in `vercel.json`.
-- Safe non-destructive fix committed in LOGIX: global `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and restrictive `Permissions-Policy`.
-- Owner navigation is preserved explicitly with `geolocation=(self)`; camera, microphone, payment and USB capabilities are disabled.
-- Developer/demo bypass was not modified.
-- Regression contract added as `test/securityHeaders.test.js`.
-- LOGIX commits: `d96038e92478cd8e63266cc7ea8402ea66eef201` (implementation), `e5a26a0282360e8894fbb1d67978b8372cb7ec93` (contract tests).
-- GitHub Quality and Vercel production deployment for the final test commit are currently running; this checkpoint is not considered VERIFIED until both succeed and production smoke is repeated.
-- No DB migration, Neon write, destructive change, secret rotation or mandatory-auth switch was performed.
+- LOGIX Center documentation now defines the product source of truth, ordered execution plan, repository/data-flow inventory and screen acceptance matrix before further implementation work.
+- Confirmed P2 mobile navigation defect was fixed: the main LOGIX drawer trigger remains available inside every workspace/portal instead of disappearing outside Dashboard. Developer/demo bypass was preserved.
+- Regression coverage now includes the mobile navigation contract and production Playwright coverage for opening the drawer from the Trips portal.
+- Production trip-detail browser assertions were aligned with the current resolved-party UI contract without weakening the requirement that company identity/address resolve beyond raw INN fallback.
+- Latest verified LOGIX head is `c2dac7c3cb66df57c308eebb192d7e3b5fdb1ad1`.
+- GitHub Actions `LOGIX Quality` run `35012569822` completed SUCCESS for that exact head.
+- Vercel production deployment `dpl_6rngDdu5jG9gtbUQJknh2Jkk7YWi` is READY for the same exact commit.
+- Production `/api/health` returned HTTP 200 with `ok=true`, `database=ok`, `authMode=demo`, and `commitSha=c2dac7c3cb66df57c308eebb192d7e3b5fdb1ad1`; owner developer bypass remains intact.
+- Exact-commit CI wait is already present, preventing production browser smoke from silently validating an older Vercel deployment.
+- No DB migration, Neon write, destructive change, data deletion, secret rotation, external transaction or mandatory-auth switch was performed.
+
+## Next Center pass
+
+Continue screen-by-screen BUSINESS_APP acceptance from `docs/CENTER_ACCEPTANCE.md`: reproduce current desktop/mobile states, classify P0/P1/P2/P3, fix root causes in dependency order, then require tests/build → matching Vercel commit → non-destructive live QA. Keep migration 006 and real external provider activation approval-gated.
