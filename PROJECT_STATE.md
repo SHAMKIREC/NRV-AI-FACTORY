@@ -3,7 +3,7 @@
 | Project | Status | Current task | Last completed | Next action | Blockers |
 |---|---|---|---|---|---|
 | NRV-DIGITAL | PAUSED | — | NRV-001 partial | — | OWNER_FOCUS_LOGIX_ONLY |
-| LOGIX | IN_PROGRESS | LOGIX-004 | BILLING_READINESS_UI + CI + DEPLOY + LIVE_QA | BUSINESS_APP_NEXT_SAFE_AUDIT | EXTERNAL_PROVIDERS_ONLY |
+| LOGIX | IN_PROGRESS | LOGIX-004 | BILLING_READINESS + OPS_RUNBOOK + READ_ONLY_NEON_DIAGNOSTICS | BUSINESS_APP_NEXT_SAFE_AUDIT | EXTERNAL_PROVIDERS_AND_APPROVAL_GATES_ONLY |
 | DOKMARKET | PAUSED | — | — | — | OWNER_FOCUS_LOGIX_ONLY |
 | SAYGO by NRV | PAUSED | SAYGO-002 | — | — | OWNER_FOCUS_LOGIX_ONLY |
 
@@ -19,17 +19,16 @@
 
 ## Latest verified evidence
 
-- `LGX-000002` присутствует в production и tenant-scoped `/api/trips`.
-- ИНН грузоотправителя `7707083893` и грузополучателя `7736207543` успешно разрешаются production endpoint `/api/party-suggest` через DaData.
-- Legacy `/api/company-by-inn` безопасно переписывается на общий lookup без добавления 13-й serverless function; Vercel production остаётся в Hobby limit: 12 functions.
-- Live browser QA открыл `LGX-000002` без мутаций и подтвердил отображение обеих компаний в карточке рейса, отсутствие overlap/broken controls.
-- ИС ЭПД/УКЭП readiness добавлен в существующий `/api/documents` без новой serverless function. Production API отвечает `provider=gis-epd`, `status=not_configured`, `readyForConnection=true`, `connectionTested=false`, `privateKeyStoredInLogix=false`; подпись/юридически значимая отправка выключены.
-- Production `/api/health` отвечает HTTP 200: database=ok, authMode=demo; developer bypass сохранён.
-- Billing/tariff readiness работает через существующий tenant-scoped `/api/catalog` без новой Vercel Function. Production API подтверждает `status=not_configured`, `readyForConnection=true`, provider/pricing unset, `tripTariffs=false`, `invoices=false`, `payments=false`, `automaticCharges=false`, `commercialTermsApproved=false`; фиктивные цены и движение денег не включены.
-- Finance UI читает `billingReadiness` из `/api/catalog` и показывает честные статусы внешних контуров вместо фиктивной оплаты. GitHub Actions `LOGIX Quality` для commit `8b9a49e0984f8115ea85d44dc5bed83477d33109` завершён `success`; Vercel commit status также `success`.
-- Live browser QA Finance прошёл PASS без мутаций: developer/demo bypass доступен без регистрации; видны `1С — Не подключена`, `ИС ЭПД / УКЭП — Оператор не подключён`, `Тарификация — Тарифная модель не настроена`; вкладки `Рейсы`, `Без тарифа`, `Счета` открываются, фиктивных цен/оплат/кнопок оплаты не обнаружено, layout остаётся рабочим.
-- Neon project `LOGIX` обнаружен как `orange-wildflower-06249962`; никаких миграций или write-операций в Neon не выполнялось. Диагностический inspect в этом цикле не использован из-за connector authorization mismatch, что не влияет на production health, подтверждённый приложением.
-- Никаких миграций, destructive DB changes, удаления данных, ротации секретов или mandatory-auth switch не выполнялось.
+- `LGX-000002` присутствует в production; ИНН обеих сторон разрешаются через `/api/party-suggest`, а live browser QA подтвердил отображение компаний без UI-дефектов.
+- Production `/api/health` ранее подтверждён HTTP 200: database=ok, authMode=demo; developer bypass сохранён.
+- ИС ЭПД/УКЭП readiness и billing/tariff readiness работают в truthful `not_configured` режиме без фиктивной подписи, отправки, цен, счетов, оплат или автоматических списаний.
+- Finance live QA ранее прошёл PASS: 1С, ИС ЭПД/УКЭП и тарификация показывают реальные readiness-состояния.
+- Добавлен `docs/OPERATIONS_READINESS.md` с production health triage, incident evidence, backup/restore approval gate и post-recovery verification. Реальный restore или recovery drill не выполнялся.
+- Neon read-only diagnostics теперь доступны: `long-running-queries` вернул 0 строк, `locks` вернул 0 строк. `vacuum-stats` прочитан без изменений БД; никаких VACUUM/DDL/write действий не выполнялось.
+- Vercel production runtime review за последние 24 часа не показал HTTP failure cluster; записи, классифицированные как error, являются Node `DEP0169 url.parse()` deprecation warnings при успешных HTTP 200 запросах `/api/trips`, `/api/documents`, `/api/party-suggest`. Поиск first-party `url.parse` в LOGIX кода не нашёл, поэтому предупреждение пока рассматривается как dependency/runtime-path issue, а не доказанный дефект LOGIX.
+- `LOGIX/TASKS.md` синхронизирован: billing readiness перенесён в DONE, operations/recovery readiness стал текущим безопасным направлением; production recovery drill явно оставлен approval-gated.
+- GitHub Actions `LOGIX Quality` для нового documentation/state slice запущен; на момент фиксации состояния run 231 для head `be423ba1ed68d8d648d261a1c496f913dd3fc4d1` ещё pending, поэтому этот slice не помечен Reviewer APPROVED.
+- Никаких миграций, destructive DB changes, удаления данных, ротации секретов, restore, mandatory-auth switch или production mutation E2E не выполнялось.
 
 ## State rules
 
