@@ -28,3 +28,14 @@ ACCEPTANCE_CRITERIA:
 - Reviewer выполняет отдельный VERIFY pass и фиксирует результат в Factory.
 TEST_REQUIREMENTS: npm test; npm run build; API smoke; Vercel deploy check; security negative-case review; mobile/visual review доступными средствами; diff review.
 STATUS: IN_PROGRESS
+
+## Current cycle checkpoint — production browser hardening
+
+- BUSINESS_APP security review found that application/API responses did not have a centralized browser-header baseline in `vercel.json`.
+- Safe non-destructive fix committed in LOGIX: global `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and restrictive `Permissions-Policy`.
+- Owner navigation is preserved explicitly with `geolocation=(self)`; camera, microphone, payment and USB capabilities are disabled.
+- Developer/demo bypass was not modified.
+- Regression contract added as `test/securityHeaders.test.js`.
+- LOGIX commits: `d96038e92478cd8e63266cc7ea8402ea66eef201` (implementation), `e5a26a0282360e8894fbb1d67978b8372cb7ec93` (contract tests).
+- GitHub Quality and Vercel production deployment for the final test commit are currently running; this checkpoint is not considered VERIFIED until both succeed and production smoke is repeated.
+- No DB migration, Neon write, destructive change, secret rotation or mandatory-auth switch was performed.
