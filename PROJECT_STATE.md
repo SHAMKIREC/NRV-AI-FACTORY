@@ -20,14 +20,15 @@
 ## Latest verified evidence
 
 - `LGX-000002` присутствует в production; ИНН обеих сторон разрешаются через `/api/party-suggest`, а live browser QA подтвердил отображение компаний без UI-дефектов.
-- Production `/api/health` ранее подтверждён HTTP 200: database=ok, authMode=demo; developer bypass сохранён.
+- Production `/api/health` повторно подтверждён 2026-09-15: HTTP 200, `database=ok`, `authMode=demo`; developer bypass сохранён. Измеренная DB health latency на этой проверке — 671 ms.
 - ИС ЭПД/УКЭП readiness и billing/tariff readiness работают в truthful `not_configured` режиме без фиктивной подписи, отправки, цен, счетов, оплат или автоматических списаний.
 - Finance live QA ранее прошёл PASS: 1С, ИС ЭПД/УКЭП и тарификация показывают реальные readiness-состояния.
 - Добавлен `docs/OPERATIONS_READINESS.md` с production health triage, incident evidence, backup/restore approval gate и post-recovery verification. Реальный restore или recovery drill не выполнялся.
-- Neon read-only diagnostics теперь доступны: `long-running-queries` вернул 0 строк, `locks` вернул 0 строк. `vacuum-stats` прочитан без изменений БД; никаких VACUUM/DDL/write действий не выполнялось.
+- Neon read-only diagnostics доступны: `long-running-queries` вернул 0 строк, `locks` вернул 0 строк. `vacuum-stats` прочитан без изменений БД; никаких VACUUM/DDL/write действий не выполнялось.
 - Vercel production runtime review за последние 24 часа не показал HTTP failure cluster; записи, классифицированные как error, являются Node `DEP0169 url.parse()` deprecation warnings при успешных HTTP 200 запросах `/api/trips`, `/api/documents`, `/api/party-suggest`. Поиск first-party `url.parse` в LOGIX кода не нашёл, поэтому предупреждение пока рассматривается как dependency/runtime-path issue, а не доказанный дефект LOGIX.
 - `LOGIX/TASKS.md` синхронизирован: billing readiness перенесён в DONE, operations/recovery readiness стал текущим безопасным направлением; production recovery drill явно оставлен approval-gated.
-- GitHub Actions `LOGIX Quality` для нового documentation/state slice запущен; на момент фиксации состояния run 231 для head `be423ba1ed68d8d648d261a1c496f913dd3fc4d1` ещё pending, поэтому этот slice не помечен Reviewer APPROVED.
+- GitHub Actions `LOGIX Quality` run 231 для head `be423ba1ed68d8d648d261a1c496f913dd3fc4d1` завершён `success`; соответствующий production deployment `dpl_D4rTksHqQaWKiWVUYnqjMMkaN4C7` имеет состояние `READY`, target `production`, runtime — 12 Node.js Functions.
+- Operations-readiness documentation/state slice теперь считается VERIFIED. Recovery drill, migration `006_trip_create_idempotency.sql`, mandatory auth и mutation E2E остаются approval-gated и не выполнялись.
 - Никаких миграций, destructive DB changes, удаления данных, ротации секретов, restore, mandatory-auth switch или production mutation E2E не выполнялось.
 
 ## State rules
