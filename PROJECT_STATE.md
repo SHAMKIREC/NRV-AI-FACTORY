@@ -3,7 +3,7 @@
 | Project | Status | Current task | Last completed | Next action | Blockers |
 |---|---|---|---|---|---|
 | NRV-DIGITAL | PAUSED | — | NRV-001 partial | — | OWNER_FOCUS_LOGIX_ONLY |
-| LOGIX | IN_PROGRESS | LOGIX-004 | BILLING_READINESS_BACKEND + PRODUCTION_API | VERIFY_BILLING_UI_CI_DEPLOY_LIVE_QA | EXTERNAL_PROVIDERS_ONLY |
+| LOGIX | IN_PROGRESS | LOGIX-004 | BILLING_READINESS_UI + CI + DEPLOY + LIVE_QA | BUSINESS_APP_NEXT_SAFE_AUDIT | EXTERNAL_PROVIDERS_ONLY |
 | DOKMARKET | PAUSED | — | — | — | OWNER_FOCUS_LOGIX_ONLY |
 | SAYGO by NRV | PAUSED | SAYGO-002 | — | — | OWNER_FOCUS_LOGIX_ONLY |
 
@@ -26,7 +26,9 @@
 - ИС ЭПД/УКЭП readiness добавлен в существующий `/api/documents` без новой serverless function. Production API отвечает `provider=gis-epd`, `status=not_configured`, `readyForConnection=true`, `connectionTested=false`, `privateKeyStoredInLogix=false`; подпись/юридически значимая отправка выключены.
 - Production `/api/health` отвечает HTTP 200: database=ok, authMode=demo; developer bypass сохранён.
 - Billing/tariff readiness работает через существующий tenant-scoped `/api/catalog` без новой Vercel Function. Production API подтверждает `status=not_configured`, `readyForConnection=true`, provider/pricing unset, `tripTariffs=false`, `invoices=false`, `payments=false`, `automaticCharges=false`, `commercialTermsApproved=false`; фиктивные цены и движение денег не включены.
-- Finance UI обновлён для чтения `billingReadiness` из `/api/catalog` и показа реальных требований подключения вместо фиктивной оплаты; regression contract добавлен. Финальная CI/deploy/live QA проверка этого UI ещё выполняется.
+- Finance UI читает `billingReadiness` из `/api/catalog` и показывает честные статусы внешних контуров вместо фиктивной оплаты. GitHub Actions `LOGIX Quality` для commit `8b9a49e0984f8115ea85d44dc5bed83477d33109` завершён `success`; Vercel commit status также `success`.
+- Live browser QA Finance прошёл PASS без мутаций: developer/demo bypass доступен без регистрации; видны `1С — Не подключена`, `ИС ЭПД / УКЭП — Оператор не подключён`, `Тарификация — Тарифная модель не настроена`; вкладки `Рейсы`, `Без тарифа`, `Счета` открываются, фиктивных цен/оплат/кнопок оплаты не обнаружено, layout остаётся рабочим.
+- Neon project `LOGIX` обнаружен как `orange-wildflower-06249962`; никаких миграций или write-операций в Neon не выполнялось. Диагностический inspect в этом цикле не использован из-за connector authorization mismatch, что не влияет на production health, подтверждённый приложением.
 - Никаких миграций, destructive DB changes, удаления данных, ротации секретов или mandatory-auth switch не выполнялось.
 
 ## State rules
