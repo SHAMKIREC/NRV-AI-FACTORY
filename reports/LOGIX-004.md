@@ -6,23 +6,23 @@ QUALITY_PROFILE: BUSINESS_APP
 
 ## Current verified checkpoint — 2026-09-16
 
-The current cycle was re-reviewed against the actual LOGIX main branch rather than the older Factory checkpoint.
+The current cycle was re-reviewed against the actual LOGIX main branch rather than an older Factory checkpoint.
 
-- Latest verified LOGIX head is `6d64ffcdcb4822490bed75e4a8f8cee3e460f5f9` (`test(e2e): cover safe empty and error workspace states`).
-- GitHub Actions `LOGIX Quality` run `35048278917` completed SUCCESS for that exact head.
-- `npm test`: 83 passed, 0 failed, 0 skipped.
+- Latest verified LOGIX head is `2c1d1f2d3e714d102e9bd7d3c2d8cd3d6d64e0fc` (`test(center): lock trip propagation across LOGIX workspaces`).
+- GitHub Actions `LOGIX Quality` run `35055441861` completed SUCCESS for that exact head.
+- `npm test`: 89 passed, 0 failed, 0 skipped.
 - `npm run build`: PASS with Vite 8.2.2. The known performance warning is isolated to the lazy MapLibre chunk (~920.58 kB minified / ~246.59 kB gzip); core and portal chunks remain substantially smaller.
-- The CI production gate queried `https://logix-indol.vercel.app/api/health` and confirmed the exact deployed SHA `6d64ffcdcb4822490bed75e4a8f8cee3e460f5f9` before starting browser QA.
-- Production Playwright ran 12 project/scenario combinations: 7 passed, 5 intentionally skipped by desktop/mobile scope, 0 failed.
+- The CI production gate queried `https://logix-indol.vercel.app/api/health` and confirmed the exact deployed SHA `2c1d1f2d3e714d102e9bd7d3c2d8cd3d6d64e0fc` before starting browser QA.
+- Production Playwright ran 12 project/scenario combinations: 6 passed, 6 intentionally skipped by desktop/mobile scope, 0 failed.
 - Desktop smoke opens all connected business areas through canonical navigation: Trips, Documents, EPD/eTRN, Counterparties, Fleet, Drivers, Dispatch, Finance, Analytics, 1C, Notifications and Settings.
 - Mobile smoke verifies Trips → Documents → Counterparties → Finance, persistent global drawer access inside workspaces and no document-level horizontal overflow.
 - Existing production trip detail remains non-destructively verified for resolved company identity/address, visible status action, embedded documents and transition into Documents.
-- New non-destructive browser interception verifies Documents exposes the API error message and a visible Retry action when `/api/documents` fails.
-- New isolated empty-state fixtures verify Documents presents a truthful first-document action and Counterparties explains that records derive from created trips.
-- DirectoryPortal now refreshes derived counterparties/driver/fleet state on both `logix:trips-changed` and window focus. This closes the prior propagation gap where an already-open directory could retain stale derived trip relationships.
-- Dashboard and global search already refresh from the same mutation event; Trips refreshes on event/focus; Documents reloads persisted trip/document state when opened.
+- Non-destructive browser interception verifies Documents exposes the API error message and a visible Retry action when `/api/documents` fails.
+- Isolated empty-state fixtures verify Documents presents a truthful first-document action and Counterparties explains that records derive from created trips.
+- DirectoryPortal refreshes derived counterparties/driver/fleet state on both `logix:trips-changed` and window focus.
+- Golden trip propagation is now explicitly locked by regression contracts: successful creation and status mutation publish the canonical event; Dashboard and global search subscribe to it; directories derive from persisted trips and resolve saved INNs; Documents load persisted trips and link documents by trip UUID; the golden workspaces are forbidden from owning mock trip datasets.
 - Developer/demo bypass is still present and explicitly tested. This remains an owner testing path, not a claim that production user authorization is complete.
-- No production data was created/deleted by the browser QA. No Neon migration, destructive SQL, secret rotation, external provider transaction or mandatory-auth switch was performed.
+- No production data was created/deleted by browser QA. No Neon migration, destructive SQL, secret rotation, external provider transaction or mandatory-auth switch was performed.
 
 ## Previously verified architecture/security state still applicable
 
@@ -62,6 +62,6 @@ Owner/external approval gates:
 
 ## Reviewer decision
 
-The latest safe UI/state-coverage slice passes BUSINESS_APP quality gates: code tests, build, exact-commit production deployment check, desktop/mobile browser behavior, non-destructive negative-state QA and developer bypass preservation are green. No new P0/P1 defect was found in this pass. LOGIX-004 remains IN_PROGRESS because production auth/two-tenant E2E, isolated mutation E2E, broader negative-state coverage, CSS consolidation, operations readiness and external integrations are not complete.
+The latest safe propagation-contract slice passes BUSINESS_APP quality gates: 89/89 tests, production build, exact-commit deployment verification and non-destructive desktop/mobile browser QA are green. No new P0/P1 defect was found. LOGIX-004 remains IN_PROGRESS because production auth/two-tenant E2E, isolated mutation E2E, broader negative-state coverage, CSS consolidation, operations readiness and external integrations are not complete.
 
 No owner notification is required for this checkpoint: the next work items remain safe and autonomous, and LOGIX has not reached the near-finish threshold where only owner-dependent decisions remain.
