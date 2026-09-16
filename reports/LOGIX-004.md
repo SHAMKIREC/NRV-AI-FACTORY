@@ -8,16 +8,15 @@ QUALITY_PROFILE: BUSINESS_APP
 
 The current cycle was re-reviewed against the actual LOGIX main branch rather than an older Factory checkpoint.
 
-- Latest verified LOGIX head is `daeef531312836c453e117e453f2377ad9f2ea90` (`test(e2e): cover recoverable workspace API failures`).
-- GitHub Actions `LOGIX Quality` run `35061638897` completed SUCCESS for that exact head.
-- `npm test`: 89 passed, 0 failed, 0 skipped.
-- `npm run build`: PASS with Vite 8.2.2. The known performance warning remains isolated to the lazy MapLibre chunk (~920.58 kB minified / ~246.59 kB gzip); core and portal chunks remain substantially smaller.
-- The CI production gate queried `https://logix-indol.vercel.app/api/health` and confirmed the exact deployed SHA `daeef531312836c453e117e453f2377ad9f2ea90` before starting browser QA.
-- Production Playwright ran 16 project/scenario combinations: 8 passed, 8 intentionally skipped by desktop/mobile scope, 0 failed.
-- Desktop smoke opens all connected business areas through canonical navigation: Trips, Documents, EPD/eTRN, Counterparties, Fleet, Drivers, Dispatch, Finance, Analytics, 1C, Notifications and Settings.
-- Mobile smoke verifies Trips → Documents → Counterparties → Finance, persistent global drawer access inside workspaces and no document-level horizontal overflow.
+- Latest fully green production checkpoint remains `daeef531312836c453e117e453f2377ad9f2ea90` (`test(e2e): cover recoverable workspace API failures`), GitHub Actions run `35061638897`: SUCCESS.
+- Subsequent Center work expanded regression coverage for golden trip propagation and explicit workspace loading states.
+- LOGIX head `7e464c740b08d2eec76b049358dca993cd20307d` passed all 96 unit/contract tests and production build; the exact production SHA gate also passed. Its browser run failed only in the new delayed loading-state fixture with Playwright `Route is already handled`, not in product runtime behavior.
+- The delayed fixture helper was hardened non-destructively in LOGIX commit `09d068f65b50e5d0abd78130b41b1394ace64ce5`: cancelled/already-handled intercepted requests no longer turn a loading-state assertion into an infrastructure failure, and route cleanup is guarded when the page is closed. Fresh CI/deployment verification is pending for this head.
+- The known performance warning remains isolated to the lazy MapLibre chunk (~920.58 kB minified / ~246.59 kB gzip); core and portal chunks remain substantially smaller.
+- Desktop smoke covers all connected business areas through canonical navigation: Trips, Documents, EPD/eTRN, Counterparties, Fleet, Drivers, Dispatch, Finance, Analytics, 1C, Notifications and Settings.
+- Mobile smoke covers Trips → Documents → Counterparties → Finance, persistent global drawer access inside workspaces and no document-level horizontal overflow.
 - Existing production trip detail remains non-destructively verified for resolved company identity/address, visible status action, embedded documents and transition into Documents.
-- Recoverable negative-state browser coverage now exists for Documents, Trips, Directory, Finance and Core using isolated request interception; failures show real API errors/retry actions and do not render stale business rows/totals.
+- Recoverable negative-state browser coverage exists for Documents, Trips, Directory, Finance and Core using isolated request interception; failures show real API errors/retry actions and do not render stale business rows/totals.
 - Isolated empty-state fixtures verify Documents presents a truthful first-document action and Counterparties explains that records derive from created trips.
 - DirectoryPortal refreshes derived counterparties/driver/fleet state on both `logix:trips-changed` and window focus.
 - Golden trip propagation is explicitly locked by regression contracts: successful creation and status mutation publish the canonical event; Dashboard and global search subscribe to it; directories derive from persisted trips and resolve saved INNs; Documents load persisted trips and link documents by trip UUID; the golden workspaces are forbidden from owning mock trip datasets.
@@ -42,7 +41,7 @@ P1 / release boundary:
 - A full create-trip mutation E2E is still intentionally excluded from production because current QA must not persist synthetic records in the real production dataset. Add it only against an isolated/synthetic environment or with a safe cleanup contract.
 
 P2 / frontend and state coverage:
-- Loading-state acceptance is not yet explicit for every workspace owner. Error-state coverage for Documents, Trips, Directory, Finance and Core is now present and green.
+- Loading-state acceptance has been added for Trips, Documents, Directory, Finance and Core; the fixture infrastructure is currently being re-verified after the route-cancellation fix.
 - Mobile/dashboard CSS is still fragmented across a historical chain of overrides. Consolidation must be incremental and regression-tested; blind deletion is prohibited.
 - Role visibility/action matrix is not frozen yet. Current request context exposes roles, but restrictive business RBAC must not be invented ad hoc.
 
@@ -62,6 +61,6 @@ Owner/external approval gates:
 
 ## Reviewer decision
 
-The latest safe negative-state slice passes BUSINESS_APP quality gates: 89/89 tests, production build, exact-commit deployment verification and non-destructive desktop/mobile browser QA are green. No new P0/P1 defect was found. LOGIX-004 remains IN_PROGRESS because production auth/two-tenant E2E, isolated mutation E2E, loading-state coverage, CSS consolidation, operations readiness and external integrations are not complete.
+LOGIX-004 remains IN_PROGRESS. The latest product code still has no newly identified P0/P1 runtime defect; the current red signal is isolated to newly added browser-test fixture handling and has a safe fix committed for fresh CI verification. Continue autonomous verification and safe P2 work after the head is green.
 
 No owner notification is required for this checkpoint: the next work items remain safe and autonomous, and LOGIX has not reached the near-finish threshold where only owner-dependent decisions remain.
