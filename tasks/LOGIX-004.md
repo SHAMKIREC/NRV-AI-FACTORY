@@ -37,18 +37,23 @@ STATUS: IN_PROGRESS
 - Mobile production smoke verifies Trips → Documents → Counterparties → Finance, persistent drawer access and no document-level horizontal overflow.
 - Recoverable negative-state browser coverage exists for Documents, Trips, Directory, Finance and Core; isolated empty-state fixtures cover Documents and Counterparties.
 - Golden trip propagation has an explicit regression contract covering creation/status mutation events, Dashboard/global-search refresh, directory derivation from persisted trips + saved INNs, document linkage by trip UUID and the prohibition on mock trip truth.
-- New data-integrity finding fixed: DashboardLiveSummary previously requested only the first 100 trips, so KPI/status/alert totals could become partial after the dataset exceeded 100 rows. `src/tripData.js` now follows `/api/trips` pagination until the persisted set is complete, rejects invalid pagination and caps client aggregation at 5000 rows pending future server aggregation.
-- Regression tests cover multi-page loading and fail-safe handling of broken pagination. The existing propagation contract was updated to require the paginated source instead of the old first-page fetch.
-- Current LOGIX implementation head: `381c4e9fb17ba4c4bad797b96bc7b0e87d8ea19e`.
-- CI run `35083273001`: unit/contract tests and production build are green; Vercel status for the same commit is SUCCESS. Exact-commit wait + browser smoke are still running at this checkpoint.
-- No DB migration, Neon write, destructive change, data deletion, secret rotation, external transaction or mandatory-auth switch was performed.
+- Complete-trip pagination is now shared by DashboardLiveSummary, global search, Finance and Core (Analytics/1C/Notifications/Settings), removing the known first-100 truncation from business totals and search.
+- `src/tripData.js` follows `/api/trips` pagination until the persisted set is complete, rejects invalid pagination and caps client aggregation at 5000 rows pending future server aggregation.
+- Regression contracts cover multi-page loading, broken pagination and complete-trip propagation.
+- Trip create UI now sends a stable `Idempotency-Key`; production migration 006 was applied with owner approval and server-side trip-create idempotency was connected afterward.
+- Trip start workflow was corrected so a fully assigned draft can be started without exposing the invalid `draft → in_transit` transition error to the operator; ordinary status transition protection remains enforced.
+- Current LOGIX implementation head: `a9c0951b4bb81587a98af7ba9ac4001b5d7fcc7b` (`fix(core): use complete trip dataset`).
+- CI run `35117357965` / #288 is green for that exact head: tests/build and workflow quality gates completed successfully.
+- Historical mobile CSS remains layered: `mobile-production.css` still carries broad `!important` overrides while the later authoritative mobile layer exists. Consolidation remains a regression-sensitive task and must not be done by blind deletion.
+- No destructive DB/data operation, secret rotation, external 1C/EPD transaction or mandatory-auth switch was performed in this cycle.
 
 ## Current priority queue
 
-1. Finish exact-commit production browser verification for `381c4e9f`; if green, sync Reviewer report.
-2. Audit the same first-page truncation risk in Analytics/global search/other summary consumers and move reusable readers to the paginated source where business totals require completeness.
-3. Continue explicit loading-state acceptance for every workspace owner.
+1. Verify exact-head production deployment/health and browser smoke when connected Vercel/browser QA is available.
+2. Continue audit for any remaining trip consumers that require complete persisted totals; do not replace intentionally paginated list views.
+3. Continue explicit loading/empty/error acceptance for every workspace owner.
 4. Add isolated/synthetic mutation E2E only when it can avoid persistent production data; do not mutate real production records merely to satisfy a test.
-5. Consolidate the historical mobile CSS chain carefully with regression QA; do not blind-delete overrides.
+5. Consolidate the historical mobile CSS chain carefully with regression QA; current priority is overlap/density issues visible on narrow mobile screens, while preserving drawer reachability and touch targets.
 6. Freeze role visibility/action matrix before mandatory auth; preserve developer bypass.
-7. Keep migration 006, real 1C, real EPD/UKЭП, billing commercial activation and mandatory auth approval-gated.
+7. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
+8. Mandatory user auth remains approval/rollout gated and must retain owner developer access.
