@@ -36,14 +36,15 @@ STATUS: IN_PROGRESS
 - Desktop production smoke opens all connected workspaces through canonical navigation.
 - Mobile production smoke verifies Trips → Documents → Counterparties → Finance, persistent drawer access and no document-level horizontal overflow.
 - Shared portal selectors are aligned with the actual component ownership (Documents/EPD, directories, Trips/Dispatch, Core sections).
-- DirectoryPortal now refreshes derived counterparties/driver/fleet data on `logix:trips-changed` and window focus; the contract is regression-tested.
-- Non-destructive browser fixtures now verify a recoverable Documents API error state and truthful empty states for Documents and Counterparties.
-- Latest verified LOGIX head: `6d64ffcdcb4822490bed75e4a8f8cee3e460f5f9`.
-- GitHub Actions `LOGIX Quality` run `35048278917`: SUCCESS.
-- Unit/contract suite: 83 passed, 0 failed.
+- DirectoryPortal refreshes derived counterparties/driver/fleet data on `logix:trips-changed` and window focus; the contract is regression-tested.
+- Non-destructive browser fixtures verify a recoverable Documents API error state and truthful empty states for Documents and Counterparties.
+- Golden trip propagation now has an explicit regression contract covering creation/status mutation events, Dashboard/global-search refresh, directory derivation from persisted trips + saved INNs, document linkage by trip UUID and the prohibition on mock trip truth in these workspaces.
+- Latest verified LOGIX head: `2c1d1f2d3e714d102e9bd7d3c2d8cd3d6d64e0fc`.
+- GitHub Actions `LOGIX Quality` run `35055441861`: SUCCESS.
+- Unit/contract suite: 89 passed, 0 failed, 0 skipped.
 - Production build: PASS. Known warning remains the separately lazy MapLibre chunk (~920.58 kB minified / ~246.59 kB gzip).
-- Exact production gate confirmed `/api/health` reported commit `6d64ffcdcb4822490bed75e4a8f8cee3e460f5f9` before browser QA.
-- Production Playwright: 7 passed, 5 intentionally skipped by desktop/mobile scope, 0 failed.
+- Exact production gate confirmed `/api/health` reported commit `2c1d1f2d3e714d102e9bd7d3c2d8cd3d6d64e0fc` before browser QA.
+- Production Playwright: 6 passed, 6 intentionally skipped by desktop/mobile scope, 0 failed.
 - No DB migration, Neon write, destructive change, data deletion, secret rotation, external transaction or mandatory-auth switch was performed.
 
 ## Current priority queue
