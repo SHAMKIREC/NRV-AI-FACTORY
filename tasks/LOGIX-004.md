@@ -31,26 +31,24 @@ STATUS: IN_PROGRESS
 
 ## Current cycle checkpoint — 2026-09-16
 
-- Center inventory/acceptance and the real navigation ownership are synchronized with current LOGIX.
-- Owner developer/demo bypass remains intact and is explicitly covered by tests; it is not represented as completed production user authorization.
+- Center inventory/acceptance and real navigation ownership are synchronized with current LOGIX.
+- Owner developer/demo bypass remains intact and explicitly covered; it is not represented as completed production user authorization.
 - Desktop production smoke opens all connected workspaces through canonical navigation.
 - Mobile production smoke verifies Trips → Documents → Counterparties → Finance, persistent drawer access and no document-level horizontal overflow.
-- Shared portal selectors are aligned with the actual component ownership (Documents/EPD, directories, Trips/Dispatch, Core sections).
-- DirectoryPortal refreshes derived counterparties/driver/fleet data on `logix:trips-changed` and window focus; the contract is regression-tested.
-- Non-destructive browser fixtures verify a recoverable Documents API error state and truthful empty states for Documents and Counterparties.
-- Golden trip propagation now has an explicit regression contract covering creation/status mutation events, Dashboard/global-search refresh, directory derivation from persisted trips + saved INNs, document linkage by trip UUID and the prohibition on mock trip truth in these workspaces.
-- Latest verified LOGIX head: `2c1d1f2d3e714d102e9bd7d3c2d8cd3d6d64e0fc`.
-- GitHub Actions `LOGIX Quality` run `35055441861`: SUCCESS.
-- Unit/contract suite: 89 passed, 0 failed, 0 skipped.
-- Production build: PASS. Known warning remains the separately lazy MapLibre chunk (~920.58 kB minified / ~246.59 kB gzip).
-- Exact production gate confirmed `/api/health` reported commit `2c1d1f2d3e714d102e9bd7d3c2d8cd3d6d64e0fc` before browser QA.
-- Production Playwright: 6 passed, 6 intentionally skipped by desktop/mobile scope, 0 failed.
+- Recoverable negative-state browser coverage exists for Documents, Trips, Directory, Finance and Core; isolated empty-state fixtures cover Documents and Counterparties.
+- Golden trip propagation has an explicit regression contract covering creation/status mutation events, Dashboard/global-search refresh, directory derivation from persisted trips + saved INNs, document linkage by trip UUID and the prohibition on mock trip truth.
+- New data-integrity finding fixed: DashboardLiveSummary previously requested only the first 100 trips, so KPI/status/alert totals could become partial after the dataset exceeded 100 rows. `src/tripData.js` now follows `/api/trips` pagination until the persisted set is complete, rejects invalid pagination and caps client aggregation at 5000 rows pending future server aggregation.
+- Regression tests cover multi-page loading and fail-safe handling of broken pagination. The existing propagation contract was updated to require the paginated source instead of the old first-page fetch.
+- Current LOGIX implementation head: `381c4e9fb17ba4c4bad797b96bc7b0e87d8ea19e`.
+- CI run `35083273001`: unit/contract tests and production build are green; Vercel status for the same commit is SUCCESS. Exact-commit wait + browser smoke are still running at this checkpoint.
 - No DB migration, Neon write, destructive change, data deletion, secret rotation, external transaction or mandatory-auth switch was performed.
 
 ## Current priority queue
 
-1. Continue loading/empty/error-state acceptance for Trips, Directory, Finance and Core owners using non-destructive browser interception where possible.
-2. Add isolated/synthetic mutation E2E only when it can avoid persistent production data; do not mutate real production records merely to satisfy a test.
-3. Consolidate the historical mobile CSS chain carefully with regression QA; do not blind-delete overrides.
-4. Freeze role visibility/action matrix before mandatory auth; preserve developer bypass.
-5. Keep migration 006, real 1C, real EPD/UKЭП, billing commercial activation and mandatory auth approval-gated.
+1. Finish exact-commit production browser verification for `381c4e9f`; if green, sync Reviewer report.
+2. Audit the same first-page truncation risk in Analytics/global search/other summary consumers and move reusable readers to the paginated source where business totals require completeness.
+3. Continue explicit loading-state acceptance for every workspace owner.
+4. Add isolated/synthetic mutation E2E only when it can avoid persistent production data; do not mutate real production records merely to satisfy a test.
+5. Consolidate the historical mobile CSS chain carefully with regression QA; do not blind-delete overrides.
+6. Freeze role visibility/action matrix before mandatory auth; preserve developer bypass.
+7. Keep migration 006, real 1C, real EPD/UKЭП, billing commercial activation and mandatory auth approval-gated.
