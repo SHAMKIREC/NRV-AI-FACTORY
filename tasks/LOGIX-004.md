@@ -29,19 +29,27 @@ ACCEPTANCE_CRITERIA:
 TEST_REQUIREMENTS: npm test; npm run build; API smoke; Vercel deploy check; security negative-case review; mobile/visual review доступными средствами; diff review.
 STATUS: IN_PROGRESS
 
-## Current cycle checkpoint — Center + live verification
+## Current cycle checkpoint — 2026-09-16
 
-- LOGIX Center documentation now defines the product source of truth, ordered execution plan, repository/data-flow inventory and screen acceptance matrix before further implementation work.
-- Confirmed P2 mobile navigation defect was fixed: the main LOGIX drawer trigger remains available inside every workspace/portal instead of disappearing outside Dashboard. Developer/demo bypass was preserved.
-- Regression coverage now includes the mobile navigation contract and production Playwright coverage for opening the drawer from the Trips portal.
-- Production trip-detail browser assertions were aligned with the current resolved-party UI contract without weakening the requirement that company identity/address resolve beyond raw INN fallback.
-- Latest verified LOGIX head is `c2dac7c3cb66df57c308eebb192d7e3b5fdb1ad1`.
-- GitHub Actions `LOGIX Quality` run `35012569822` completed SUCCESS for that exact head.
-- Vercel production deployment `dpl_6rngDdu5jG9gtbUQJknh2Jkk7YWi` is READY for the same exact commit.
-- Production `/api/health` returned HTTP 200 with `ok=true`, `database=ok`, `authMode=demo`, and `commitSha=c2dac7c3cb66df57c308eebb192d7e3b5fdb1ad1`; owner developer bypass remains intact.
-- Exact-commit CI wait is already present, preventing production browser smoke from silently validating an older Vercel deployment.
+- Center inventory/acceptance and the real navigation ownership are synchronized with current LOGIX.
+- Owner developer/demo bypass remains intact and is explicitly covered by tests; it is not represented as completed production user authorization.
+- Desktop production smoke opens all connected workspaces through canonical navigation.
+- Mobile production smoke verifies Trips → Documents → Counterparties → Finance, persistent drawer access and no document-level horizontal overflow.
+- Shared portal selectors are aligned with the actual component ownership (Documents/EPD, directories, Trips/Dispatch, Core sections).
+- DirectoryPortal now refreshes derived counterparties/driver/fleet data on `logix:trips-changed` and window focus; the contract is regression-tested.
+- Non-destructive browser fixtures now verify a recoverable Documents API error state and truthful empty states for Documents and Counterparties.
+- Latest verified LOGIX head: `6d64ffcdcb4822490bed75e4a8f8cee3e460f5f9`.
+- GitHub Actions `LOGIX Quality` run `35048278917`: SUCCESS.
+- Unit/contract suite: 83 passed, 0 failed.
+- Production build: PASS. Known warning remains the separately lazy MapLibre chunk (~920.58 kB minified / ~246.59 kB gzip).
+- Exact production gate confirmed `/api/health` reported commit `6d64ffcdcb4822490bed75e4a8f8cee3e460f5f9` before browser QA.
+- Production Playwright: 7 passed, 5 intentionally skipped by desktop/mobile scope, 0 failed.
 - No DB migration, Neon write, destructive change, data deletion, secret rotation, external transaction or mandatory-auth switch was performed.
 
-## Next Center pass
+## Current priority queue
 
-Continue screen-by-screen BUSINESS_APP acceptance from `docs/CENTER_ACCEPTANCE.md`: reproduce current desktop/mobile states, classify P0/P1/P2/P3, fix root causes in dependency order, then require tests/build → matching Vercel commit → non-destructive live QA. Keep migration 006 and real external provider activation approval-gated.
+1. Continue loading/empty/error-state acceptance for Trips, Directory, Finance and Core owners using non-destructive browser interception where possible.
+2. Add isolated/synthetic mutation E2E only when it can avoid persistent production data; do not mutate real production records merely to satisfy a test.
+3. Consolidate the historical mobile CSS chain carefully with regression QA; do not blind-delete overrides.
+4. Freeze role visibility/action matrix before mandatory auth; preserve developer bypass.
+5. Keep migration 006, real 1C, real EPD/UKЭП, billing commercial activation and mandatory auth approval-gated.
