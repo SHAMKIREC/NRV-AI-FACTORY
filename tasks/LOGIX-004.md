@@ -43,14 +43,16 @@ STATUS: IN_PROGRESS
 - Trip create UI sends a stable `Idempotency-Key`; production migration 006 was applied with owner approval and server-side trip-create idempotency is connected and locked by regression contracts.
 - Trip start workflow allows a fully assigned draft to start without exposing the invalid `draft → in_transit` transition error; ordinary status transition protection remains enforced.
 - Role visibility/action contract is frozen in `docs/ROLE_MATRIX.md`: Developer owner, Admin, Dispatcher, Accountant and Viewer. Server mutation role guard is implemented for documents and trip POST/PATCH; developer/demo bypass remains allowed by the central guard and mandatory auth remains disabled.
-- Verified LOGIX head: `34f288a57ae068c6a883efa634faca3bc350d36a` (`test(auth): lock trip mutation roles`). GitHub Actions #298 / `35182254705` completed SUCCESS.
-- Exact-head production Vercel deployment `dpl_8mZjL3tcUc4Hu4MXWfwnsRfb2TxE` is READY. Canonical `/api/health` returns HTTP 200, `database: ok`, `authMode: demo` and matching commit SHA.
-- Production runtime aggregation over 24h shows one recurring Node `DEP0169 url.parse()` deprecation warning group. No direct repository `url.parse` usage was found, and the latest one-hour warning log query is empty; treat as dependency/runtime tracing work, not a speculative app rewrite.
+- Narrow-mobile navigation was hardened in the final authoritative mobile layer so the full drawer remains reachable inside the viewport instead of clipping lower items.
+- Verified LOGIX head: `75600bcfa9f556124c5e946c724f152910cbff46` (`fix(mobile): keep full navigation reachable in viewport`). GitHub Actions #299 / `35190239554` completed SUCCESS.
+- The immediately preceding role-enforcement head `34f288a57ae068c6a883efa634faca3bc350d36a` also passed GitHub Actions #298 / `35182254705`.
+- Production Vercel deployment/health was verified on the preceding role-enforcement head; exact-head deployment verification for `75600bcf` remains the next deployment check rather than being inferred from CI.
+- Production runtime aggregation over 24h previously showed one recurring Node `DEP0169 url.parse()` deprecation warning group. No direct repository `url.parse` usage was found, and the latest one-hour warning log query was empty; treat as dependency/runtime tracing work, not a speculative app rewrite.
 - No destructive DB/data operation, secret rotation, external 1C/EPD transaction or mandatory-auth switch was performed in this cycle.
 
 ## Current priority queue
 
-1. Continue explicit loading/empty/error acceptance for every workspace owner and fix only reproducible gaps.
+1. Verify exact-head Vercel deployment/health for `75600bcf`, then continue explicit loading/empty/error acceptance for every workspace owner and fix only reproducible gaps.
 2. Consolidate the historical mobile CSS chain incrementally with regression QA; prioritize narrow-mobile overlap/density while preserving drawer reachability and touch targets.
 3. Continue audit for any remaining trip consumers that require complete persisted totals; do not replace intentionally paginated list views.
 4. Add isolated/synthetic mutation E2E only when it can avoid persistent production data; do not mutate real production records merely to satisfy a test.
