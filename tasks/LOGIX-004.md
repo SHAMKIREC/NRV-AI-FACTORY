@@ -42,19 +42,20 @@ STATUS: IN_PROGRESS
 - Regression contracts cover multi-page loading, broken pagination and complete-trip propagation.
 - Trip create UI sends a stable `Idempotency-Key`; production migration 006 was applied with owner approval and server-side trip-create idempotency is connected and locked by regression contracts.
 - Trip start workflow allows a fully assigned draft to start without exposing the invalid `draft → in_transit` transition error; ordinary status transition protection remains enforced.
-- Role visibility/action contract is frozen in `docs/ROLE_MATRIX.md`: Developer owner, Admin, Dispatcher, Accountant and Viewer. Server mutation role guard is now implemented and its developer-bypass/role behavior is locked by tests; mandatory auth remains disabled.
-- Current verified LOGIX head: `c69506436a9f872559977454817ac91c1810384c` (`test(auth): lock developer bypass and role guard`). CI run `35158851187` / #294 completed successfully for that exact head.
-- Previous exact-head Vercel production deployment verification returned READY and `/api/health` HTTP 200 with `database: ok` and `authMode: demo`; a fresh exact-head Vercel/health check remains required after the latest auth-guard commits.
-- Node DEP0169 `url.parse()` deprecation is not present in repository source by code search; current evidence points to runtime/dependency code, so no speculative behavior change was made.
+- Role visibility/action contract is frozen in `docs/ROLE_MATRIX.md`: Developer owner, Admin, Dispatcher, Accountant and Viewer. Server mutation role guard is implemented for trip/document mutation paths and its developer-bypass/role behavior is locked by tests; mandatory auth remains disabled.
+- Current verified LOGIX head: `ed601d0c3739252ff6236625d40aecea5e04cf63` (`test(auth): lock mutation API role enforcement`). GitHub Actions run `35170705989` / #296 completed SUCCESS for that exact head.
+- Exact-head Vercel production deployment `dpl_CqX15shBUQhUDz6iis9yW8znBGDa` is READY. Exact deployment `/api/health` returned HTTP 200 with `database: ok`, `authMode: demo` and matching `commitSha: ed601d0c3739252ff6236625d40aecea5e04cf63`, confirming owner developer bypass remains active after the auth-guard commits.
+- Vercel runtime error aggregation for the latest hour reports only the known Node DEP0169 `url.parse()` deprecation on API routes; repository code search previously found no direct `url.parse()` source, so no speculative product change was made.
+- Live interactive browser QA was attempted through the available browser agent, but that provider rejected strict test mode before a session started; existing production E2E remains the current browser evidence for this checkpoint.
 - Historical mobile CSS remains layered: `mobile-production.css` still carries broad `!important` overrides while the later authoritative mobile layer exists. Consolidation remains regression-sensitive and must not be done by blind deletion.
 - No destructive DB/data operation, secret rotation, external 1C/EPD transaction or mandatory-auth switch was performed in this cycle.
 
 ## Current priority queue
 
-1. Verify the latest auth-guard head through Vercel/health and live browser QA while preserving the owner developer bypass.
-2. Continue audit for any remaining trip consumers that require complete persisted totals; do not replace intentionally paginated list views.
-3. Continue explicit loading/empty/error acceptance for every workspace owner.
-4. Add isolated/synthetic mutation E2E only when it can avoid persistent production data; do not mutate real production records merely to satisfy a test.
-5. Consolidate the historical mobile CSS chain carefully with regression QA; current priority is overlap/density issues visible on narrow mobile screens, while preserving drawer reachability and touch targets.
+1. Continue audit for any remaining trip consumers that require complete persisted totals; do not replace intentionally paginated list views.
+2. Continue explicit loading/empty/error acceptance for every workspace owner.
+3. Add isolated/synthetic mutation E2E only when it can avoid persistent production data; do not mutate real production records merely to satisfy a test.
+4. Consolidate the historical mobile CSS chain carefully with regression QA; current priority is overlap/density issues visible on narrow mobile screens, while preserving drawer reachability and touch targets.
+5. Trace the DEP0169 warning only if dependency/runtime evidence identifies an actionable source; do not rewrite working APIs speculatively.
 6. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
 7. Mandatory user auth remains rollout gated and must retain owner developer access.
