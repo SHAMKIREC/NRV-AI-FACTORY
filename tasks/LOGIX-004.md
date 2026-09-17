@@ -44,9 +44,9 @@ STATUS: IN_PROGRESS
 - Trip start workflow allows a fully assigned draft to start without exposing the invalid `draft → in_transit` transition error; ordinary status transition protection remains enforced.
 - Role visibility/action contract is frozen in `docs/ROLE_MATRIX.md`: Developer owner, Admin, Dispatcher, Accountant and Viewer. Server mutation role guard is implemented for documents and trip POST/PATCH; developer/demo bypass remains allowed by the central guard and mandatory auth remains disabled.
 - Narrow-mobile navigation was hardened in the final authoritative mobile layer so the full drawer remains reachable inside the viewport instead of clipping lower items.
-- Verified LOGIX head: `75600bcfa9f556124c5e946c724f152910cbff46` (`fix(mobile): keep full navigation reachable in viewport`). GitHub Actions #299 / `35190239554` completed SUCCESS.
-- Exact-head Vercel production deployment `dpl_87ekkF4VxbQ8WRH2XQ8MXQkacxgZ` for `75600bcf` is READY. Production `/api/health` returned HTTP 200 with `database=ok`, `authMode=demo` and the exact same `commitSha` on 2026-09-17.
-- The immediately preceding role-enforcement head `34f288a57ae068c6a883efa634faca3bc350d36a` also passed GitHub Actions #298 / `35182254705`.
+- A regression contract now locks the authoritative mobile CSS layer as the final product cascade, keeps the narrow drawer scrollable/reachable, and fixes explicit menu/backdrop/sidebar z-index ordering.
+- Verified LOGIX head: `bced74f57327e82f4e218a27a68d28424e8eb7b6` (`test(mobile): lock authoritative cascade and drawer reachability`). GitHub Actions #300 / `35225977363` completed SUCCESS.
+- Exact-head Vercel production deployment `dpl_CVfm8NnCN68Gqq2kThNqDcFWxE5f` for `bced74f5` is READY. Production `/api/health` returned HTTP 200 with `database=ok`, `authMode=demo` and exact `commitSha=bced74f57327e82f4e218a27a68d28424e8eb7b6` on 2026-09-17.
 - Production runtime aggregation over 24h previously showed one recurring Node `DEP0169 url.parse()` deprecation warning group. No direct repository `url.parse` usage was found, and the latest one-hour warning log query was empty; treat as dependency/runtime tracing work, not a speculative app rewrite.
 - No destructive DB/data operation, secret rotation, external 1C/EPD transaction or mandatory-auth switch was performed in this cycle.
 
