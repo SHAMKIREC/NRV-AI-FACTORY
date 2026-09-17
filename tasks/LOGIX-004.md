@@ -42,19 +42,19 @@ STATUS: IN_PROGRESS
 - Regression contracts cover multi-page loading, broken pagination and complete-trip propagation.
 - Trip create UI sends a stable `Idempotency-Key`; production migration 006 was applied with owner approval and server-side trip-create idempotency is connected and locked by regression contracts.
 - Trip start workflow allows a fully assigned draft to start without exposing the invalid `draft → in_transit` transition error; ordinary status transition protection remains enforced.
-- Role visibility/action contract is frozen in `docs/ROLE_MATRIX.md`: Developer owner, Admin, Dispatcher, Accountant and Viewer. Server mutation role guard is implemented for document mutations and now explicitly enforced for trip POST/PATCH as Admin/Dispatcher only; developer/demo bypass remains allowed by the central guard and mandatory auth remains disabled.
-- Latest LOGIX head under verification: `34f288a57ae068c6a883efa634faca3bc350d36a` (`test(auth): lock trip mutation roles`). GitHub Actions #298 has passed `npm test` and `npm run build`; Playwright/exact-deployment/browser-smoke stages are still running.
-- Latest exact-head Vercel deployment `dpl_8mZjL3tcUc4Hu4MXWfwnsRfb2TxE` is building. The immediately preceding implementation deployment `dpl_F9Vie4TEZp2moRdfzDdLg6Urtkqz` is READY.
-- Vercel runtime error aggregation for the latest hour currently reports no runtime error clusters.
+- Role visibility/action contract is frozen in `docs/ROLE_MATRIX.md`: Developer owner, Admin, Dispatcher, Accountant and Viewer. Server mutation role guard is implemented for documents and trip POST/PATCH; developer/demo bypass remains allowed by the central guard and mandatory auth remains disabled.
+- Verified LOGIX head: `34f288a57ae068c6a883efa634faca3bc350d36a` (`test(auth): lock trip mutation roles`). GitHub Actions #298 / `35182254705` completed SUCCESS.
+- Exact-head production Vercel deployment `dpl_8mZjL3tcUc4Hu4MXWfwnsRfb2TxE` is READY. Canonical `/api/health` returns HTTP 200, `database: ok`, `authMode: demo` and matching commit SHA.
+- Production runtime aggregation over 24h shows one recurring Node `DEP0169 url.parse()` deprecation warning group. No direct repository `url.parse` usage was found, and the latest one-hour warning log query is empty; treat as dependency/runtime tracing work, not a speculative app rewrite.
 - No destructive DB/data operation, secret rotation, external 1C/EPD transaction or mandatory-auth switch was performed in this cycle.
 
 ## Current priority queue
 
-1. Finish exact-head CI/Vercel/browser verification for `34f288a57...`; if green, promote it to the verified checkpoint.
-2. Continue audit for any remaining trip consumers that require complete persisted totals; do not replace intentionally paginated list views.
-3. Continue explicit loading/empty/error acceptance for every workspace owner.
+1. Continue explicit loading/empty/error acceptance for every workspace owner and fix only reproducible gaps.
+2. Consolidate the historical mobile CSS chain incrementally with regression QA; prioritize narrow-mobile overlap/density while preserving drawer reachability and touch targets.
+3. Continue audit for any remaining trip consumers that require complete persisted totals; do not replace intentionally paginated list views.
 4. Add isolated/synthetic mutation E2E only when it can avoid persistent production data; do not mutate real production records merely to satisfy a test.
-5. Consolidate the historical mobile CSS chain carefully with regression QA; current priority is overlap/density issues visible on narrow mobile screens, while preserving drawer reachability and touch targets.
-6. Trace runtime warnings only when dependency/runtime evidence identifies an actionable source; do not rewrite working APIs speculatively.
+5. Trace the runtime `DEP0169` warning only when stack/dependency evidence identifies an actionable source.
+6. Review MapLibre map-specific loading/performance without regressing lazy loading.
 7. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
 8. Mandatory user auth remains rollout gated and must retain owner developer access.
