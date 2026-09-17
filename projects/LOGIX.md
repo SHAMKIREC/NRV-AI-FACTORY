@@ -19,6 +19,14 @@
 
 LOGIX-004 обязан провести FULL AUDIT + AUTOFIX + VERIFY по NRV-TOOLKIT и ECC: architecture, backend/API, auth/data isolation, security, tests, mobile/desktop UX, accessibility, performance, dependencies, deployment и документацию.
 
+### Последняя подтверждённая точка — 2026-09-17
+
+- LOGIX head `75600bcfa9f556124c5e946c724f152910cbff46` (`fix(mobile): keep full navigation reachable in viewport`).
+- GitHub Actions `LOGIX Quality` #299 завершён SUCCESS.
+- Vercel production deployment `dpl_87ekkF4VxbQ8WRH2XQ8MXQkacxgZ` для этого же SHA имеет состояние READY.
+- `https://logix-indol.vercel.app/api/health` отвечает HTTP 200, `database=ok`, `authMode=demo`, `commitSha=75600bcfa9f556124c5e946c724f152910cbff46`.
+- Developer/demo bypass владельца сохранён; обязательная пользовательская авторизация не включалась.
+
 ## Важное правило
 
 Не считать сведения в этом файле актуальнее фактического состояния целевого репозитория. После каждого серьёзного прохода синхронизировать этот файл с реальным кодом и evidence.
