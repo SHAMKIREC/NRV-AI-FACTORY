@@ -6,60 +6,48 @@ QUALITY_PROFILE: BUSINESS_APP
 
 ## Current verified checkpoint — 2026-09-18
 
-Reviewer verification was refreshed against the actual current LOGIX main head.
+- Previous exact production checkpoint `ecc123cf9d3a322943e3c327b5ceff2005e93a9e` remains verified: LOGIX Quality #329 succeeded, production deployment was READY and canonical `/api/health` returned HTTP 200 with `database=ok`, `authMode=demo` and the same commit SHA.
+- Current LOGIX `main` advanced non-destructively to `7c3a8cd71638f1680ea5a235c4abd368bd723cec` with operations/security documentation only.
+- Added `docs/RECOVERY_RUNBOOK.md`: source-of-truth boundaries, safe application rollback, approval-gated database restore, post-restore integrity checks, recovery-drill procedure and incident logging are now explicit.
+- `SECURITY.md` now points to the canonical recovery procedure and explicitly separates application rollback from database rollback. RTO/RPO are not invented before a measured drill.
+- LOGIX Quality #331 (`35379757755`) was queued for the exact current head at the time of this checkpoint; exact-head production verification remains pending until CI/deploy completes.
+- No production data, schema, migration, secret, auth mode, 1C/EPD/billing integration or developer bypass was changed in this cycle.
 
-- Current LOGIX `main` is `ecc123cf9d3a322943e3c327b5ceff2005e93a9e` (`test(mobile): lock drawer dismissal contract`).
-- Exact-head GitHub Actions LOGIX Quality run #329 (`35369465955`) completed successfully.
-- Exact-head Vercel production deployment `dpl_CRkJicMTH9poGktNF6DE2QfJxCPr` is READY, targets production, and reports exactly 12 Node functions on the Hobby project.
-- Canonical `https://logix-indol.vercel.app/api/health` returned HTTP 200 with `database=ok`, `authMode=demo`, and `commitSha=ecc123cf9d3a322943e3c327b5ceff2005e93a9e`; owner developer bypass therefore remains available and the deployed runtime matches `main`.
-- Mobile drawer dismissal/accessibility fix is now fully verified: Escape closes the drawer, navigation closes it deterministically, and the trigger exposes state through `aria-expanded`/`aria-controls`; regression coverage is green on the exact production head.
-- Complete-trip pagination remains shared by DashboardLiveSummary, global search, Finance, Core, Documents and Directory; the current Core audit confirms Analytics/1C/Notifications use `fetchAllTrips()` and refresh on `logix:trips-changed`.
-- Trip create idempotency remains enabled after approved migration 006: stable UI key, tenant-scoped server reservation/replay, conflict protection, and safe expired-key reuse are covered by regression contracts.
-- Guarded trip start permits a fully assigned draft to start without exposing the invalid `draft → in_transit` error while ordinary status transition validation remains enforced.
-- Role visibility/action contract remains frozen in `docs/ROLE_MATRIX.md`; mandatory user auth remains disabled and no auth change was made in this cycle.
-- No production record was created, updated or deleted by this verification pass. No migration, secret rotation, external 1C/EPD transaction, billing activation or mandatory-auth switch was performed.
+## Product/security state still applicable
 
-## Latest autonomous cycle
-
-- Closed the stale exact-head verification gate from the Factory queue: CI #329 is green, exact production deployment is READY, and canonical health is 200 on the same SHA.
-- Re-audited Core trip consumption: Analytics, 1C readiness and Notifications consume the canonical complete-trip reader and react to trip mutation events; no first-page truncation defect was found there.
-- Re-audited the mobile CSS cascade before any deletion. `mobile-overrides.css` remains the authoritative final product CSS import and continues to override older mobile layers. Because `mobile-production.css` still owns non-duplicated workspace sizing/density rules, removing it wholesale would be unsafe; consolidation remains incremental.
-
-## Verified architecture/security state still applicable
-
-- Tenant scope is resolved server-side; browser organization headers/query parameters cannot choose a tenant.
-- Trip and document mutations retain same-origin protection.
-- Trip number allocation + insert are atomic.
-- First-user organization + user bootstrap is atomic.
-- Neon Auth provider calls are bounded and fail closed outside explicit demo mode.
-- Trip/document relationships use the production UUID/FK contract.
-- 1C, EPD/УКЭП and billing surfaces expose readiness only; they do not fake successful external exchange, signature, payment or commercial terms.
+- Complete-trip pagination is shared by DashboardLiveSummary, global search, Finance, Core, Documents and Directory.
+- Trip create idempotency is enabled after approved migration 006 and guarded by tenant-scoped server replay/conflict rules.
+- Guarded trip start permits a fully assigned draft to start without exposing the invalid `draft → in_transit` error while ordinary transition validation remains enforced.
+- Role visibility/action contract is frozen in `docs/ROLE_MATRIX.md`; mandatory auth remains disabled and owner developer access remains available.
+- Mobile drawer reachability/dismissal/accessibility is regression-covered.
+- 1C, EPD/УКЭП and billing remain readiness-only until real external configuration exists.
 
 ## Remaining findings
 
 P1 / release boundary:
-- Mandatory production user auth and two-tenant end-to-end isolation remain unverified as a live user flow. Do not enable mandatory auth while owner developer access must remain unrestricted.
-- A full create-trip mutation E2E is intentionally excluded from production because current QA must not persist synthetic records in the real production dataset. Add it only against an isolated/synthetic environment or with a safe cleanup contract.
+- Mandatory production user auth and two-tenant live E2E remain rollout-gated; owner developer access must not be locked out.
+- Full create-trip mutation E2E must use an isolated/synthetic environment or a proven cleanup contract, not production records.
 
-P2 / frontend and state coverage:
-- Continue explicit loading/empty/error acceptance for every workspace owner.
-- Mobile/dashboard CSS remains partially fragmented. Consolidation must stay incremental and regression-tested; blind deletion is prohibited.
-- Narrow-mobile overlap/density remains the priority visual cleanup area, with drawer reachability and touch targets preserved.
+P2 / frontend:
+- Continue loading/empty/error acceptance for every workspace owner.
+- Continue incremental mobile CSS consolidation; no blind deletion of historical layers.
+- Continue narrow-mobile overlap/density review while preserving drawer reachability and touch targets.
 
 P2 / performance/runtime:
-- MapLibre remains a large lazy chunk. It does not block initial portal chunks, but map-specific loading/performance should be reviewed before high-scale production.
-- Trace the `DEP0169` warning to a dependency only when stack/dependency evidence makes the source actionable; do not rewrite application URL handling without evidence.
+- Review MapLibre map-specific loading/performance without regressing lazy workspace loading.
+- Trace `DEP0169` only when stack/dependency evidence identifies an actionable source.
 
 P2 / operations:
-- Backup/restore policy, access-audit procedure and recovery drill remain incomplete for commercial production readiness.
+- Recovery policy is now documented. A real isolated recovery drill is still required before claiming measured RTO/RPO.
+- Access-audit procedure remains to be completed for commercial readiness.
 
-Owner/external approval gates:
+Owner/external gates:
 - mandatory user-auth launch decision;
 - real 1C endpoint/auth/mapping;
-- accredited EPD operator, API/signature architecture and legal exchange activation;
+- accredited EPD operator/API/signature architecture;
 - billing provider/commercial tariff model;
-- any destructive/sensitive production-data action.
+- production restore/destructive data actions or secret rotation.
 
 ## Reviewer decision
 
-LOGIX-004 remains IN_PROGRESS. The current production head is exact-SHA verified across GitHub Actions, Vercel READY and canonical health. No new P0/P1 product defect was found in this cycle, and no owner-dependent action is required yet; continue frontend acceptance, incremental CSS consolidation and isolated non-destructive QA.
+LOGIX-004 remains IN_PROGRESS. This cycle closed the documentation gap for backup/restore and incident recovery without touching production data. No owner action is required now; continue only after exact-head CI/deploy verification and then proceed with frontend acceptance, incremental CSS cleanup, MapLibre review and isolated recovery/access-audit readiness.
