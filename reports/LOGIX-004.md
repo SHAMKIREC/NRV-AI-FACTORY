@@ -4,14 +4,17 @@ ROLE: REVIEWER
 STATUS: IN_PROGRESS
 QUALITY_PROFILE: BUSINESS_APP
 
-## Current verified checkpoint — 2026-09-18
+## Current verified checkpoint — 2026-09-19
 
-- Previous exact production checkpoint `ecc123cf9d3a322943e3c327b5ceff2005e93a9e` remains verified: LOGIX Quality #329 succeeded, production deployment was READY and canonical `/api/health` returned HTTP 200 with `database=ok`, `authMode=demo` and the same commit SHA.
-- Current LOGIX `main` advanced non-destructively to `7c3a8cd71638f1680ea5a235c4abd368bd723cec` with operations/security documentation only.
-- Added `docs/RECOVERY_RUNBOOK.md`: source-of-truth boundaries, safe application rollback, approval-gated database restore, post-restore integrity checks, recovery-drill procedure and incident logging are now explicit.
-- `SECURITY.md` now points to the canonical recovery procedure and explicitly separates application rollback from database rollback. RTO/RPO are not invented before a measured drill.
-- LOGIX Quality #331 (`35379757755`) was queued for the exact current head at the time of this checkpoint; exact-head production verification remains pending until CI/deploy completes.
-- No production data, schema, migration, secret, auth mode, 1C/EPD/billing integration or developer bypass was changed in this cycle.
+- LOGIX product head `c4ec03ea843726a85679d255110347bf90af1c53` adds non-destructive mobile acceptance for every connected workspace.
+- Unit/contracts and production build passed on LOGIX Quality #333 attempt 1: 129/129 tests green and Vite production build succeeded.
+- Attempt 1 failed only because the exact Vercel deployment had not reached the canonical production alias within the workflow's six-minute wait; browser smoke was therefore skipped rather than run against an older commit.
+- Vercel subsequently reported production deployment `dpl_57TnwsUgbvCd2ZWv7KmdgsW6Cigg` READY for exact commit `c4ec03ea843726a85679d255110347bf90af1c53`.
+- Canonical `https://logix-indol.vercel.app/api/health` then returned HTTP 200 with `database=ok`, `authMode=demo` and exact `commitSha=c4ec03ea843726a85679d255110347bf90af1c53` at 2026-09-18T22:42Z.
+- LOGIX Quality #333 was re-run after exact production became available so browser smoke can verify the intended commit instead of stale production.
+- `TASKS.md` was synchronized with actual production state: approved migration 006 is no longer incorrectly listed as pending; complete-trip pagination and full mobile workspace coverage are recorded.
+- That documentation synchronization advanced LOGIX main to `dc9133bc52eb95624402062b83c495bbdeb3c52d`; exact-head CI/deploy verification for this docs-only commit remains the next verification step.
+- No production data, schema, secret, auth mode, external 1C/EPD transaction, billing activation or developer bypass was changed in this cycle.
 
 ## Product/security state still applicable
 
@@ -19,7 +22,7 @@ QUALITY_PROFILE: BUSINESS_APP
 - Trip create idempotency is enabled after approved migration 006 and guarded by tenant-scoped server replay/conflict rules.
 - Guarded trip start permits a fully assigned draft to start without exposing the invalid `draft → in_transit` error while ordinary transition validation remains enforced.
 - Role visibility/action contract is frozen in `docs/ROLE_MATRIX.md`; mandatory auth remains disabled and owner developer access remains available.
-- Mobile drawer reachability/dismissal/accessibility is regression-covered.
+- Mobile drawer reachability/dismissal/accessibility is regression-covered; the new mobile acceptance traverses all connected workspaces and checks document-level horizontal overflow.
 - 1C, EPD/УКЭП and billing remain readiness-only until real external configuration exists.
 
 ## Remaining findings
@@ -38,7 +41,7 @@ P2 / performance/runtime:
 - Trace `DEP0169` only when stack/dependency evidence identifies an actionable source.
 
 P2 / operations:
-- Recovery policy is now documented. A real isolated recovery drill is still required before claiming measured RTO/RPO.
+- Recovery policy is documented. A real isolated recovery drill is still required before claiming measured RTO/RPO.
 - Access-audit procedure remains to be completed for commercial readiness.
 
 Owner/external gates:
@@ -50,4 +53,4 @@ Owner/external gates:
 
 ## Reviewer decision
 
-LOGIX-004 remains IN_PROGRESS. This cycle closed the documentation gap for backup/restore and incident recovery without touching production data. No owner action is required now; continue only after exact-head CI/deploy verification and then proceed with frontend acceptance, incremental CSS cleanup, MapLibre review and isolated recovery/access-audit readiness.
+LOGIX-004 remains IN_PROGRESS. The highest-priority safe issue in this cycle was not a product regression but a CI/deployment race: tests/build were green, production became READY after the exact-head wait expired, and the failed workflow was re-run only after the canonical health endpoint proved the exact commit was live. No owner action is required now; continue exact-head verification, workspace state acceptance, incremental CSS cleanup, MapLibre review and isolated recovery/access-audit readiness.
