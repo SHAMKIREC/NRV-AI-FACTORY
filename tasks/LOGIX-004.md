@@ -47,17 +47,17 @@ STATUS: IN_PROGRESS
 - P0 deployment regression found on 2026-09-18: adding `api/driver-trips.js` raised Vercel Hobby serverless functions to 13 and exact-head deployments failed with `exceeded_serverless_functions_per_deployment` (limit 12).
 - Safe recovery implemented without removing product capability: 1C readiness moved into the existing tenant-scoped `api/catalog.js` function behind `view=integration1c`; `vercel.json` preserves the public `/api/integration-1c` route via rewrite; redundant `api/integration-1c.js` was removed. Production is back to exactly 12 Node functions.
 - Production deployment for recovery head `814c9e2a98cc5b5bece60dde07845542d7a75c08` is READY and owns `logix-indol.vercel.app`; `/api/health` returned HTTP 200 with `database=ok`, `authMode=demo`, exact `commitSha=814c9e2a98cc5b5bece60dde07845542d7a75c08` and 119 ms DB latency.
-- CI tests and build for head `814c9e2a...` passed their steps; exact-deployment/browser smoke remained in progress at the time of this checkpoint. Earlier stale source-contract tests were updated to the new complete Documents reader and consolidated 1C implementation.
+- Exact-head CI verification is complete: LOGIX Quality run #310 for `814c9e2a98cc5b5bece60dde07845542d7a75c08` completed successfully, closing the recovery verification gate.
+- Core Analytics/1C/Notifications already consume `fetchAllTrips()` rather than a first-page trip fetch; no additional completeness change was required in that workspace during this pass.
 - No destructive DB/data operation, secret rotation, external 1C/EPD transaction or mandatory-auth switch was performed in this cycle.
 
 ## Current priority queue
 
-1. Finish exact-head CI browser smoke for `814c9e2a...`; fix only reproducible failures.
-2. Continue explicit loading/empty/error acceptance for every workspace owner and fix only reproducible gaps.
-3. Consolidate the historical mobile CSS chain incrementally with regression QA; prioritize narrow-mobile overlap/density while preserving drawer reachability and touch targets.
-4. Continue audit for any remaining trip consumers that require complete persisted totals; do not replace intentionally paginated list views.
-5. Add isolated/synthetic mutation E2E only when it can avoid persistent production data; do not mutate real production records merely to satisfy a test.
-6. Trace the runtime `DEP0169` warning only when stack/dependency evidence identifies an actionable source.
-7. Review MapLibre map-specific loading/performance without regressing lazy loading.
-8. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
-9. Mandatory user auth remains rollout gated and must retain owner developer access.
+1. Continue explicit loading/empty/error acceptance for every workspace owner and fix only reproducible gaps.
+2. Consolidate the historical mobile CSS chain incrementally with regression QA; prioritize narrow-mobile overlap/density while preserving drawer reachability and touch targets.
+3. Continue audit for any remaining trip consumers that require complete persisted totals; do not replace intentionally paginated list views.
+4. Add isolated/synthetic mutation E2E only when it can avoid persistent production data; do not mutate real production records merely to satisfy a test.
+5. Trace the runtime `DEP0169` warning only when stack/dependency evidence identifies an actionable source.
+6. Review MapLibre map-specific loading/performance without regressing lazy loading.
+7. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
+8. Mandatory user auth remains rollout gated and must retain owner developer access.
