@@ -36,7 +36,7 @@ STATUS: IN_PROGRESS
 - Desktop production smoke opens all connected workspaces through canonical navigation.
 - Mobile production smoke verifies Trips → Documents → Counterparties → Finance, persistent drawer access and no document-level horizontal overflow.
 - Recoverable negative-state browser coverage exists for Documents, Trips, Directory, Finance and Core; isolated empty-state fixtures cover Documents and Counterparties.
-- Golden trip propagation has an explicit regression contract covering creation/status mutation events, Dashboard/global-search refresh, directory derivation from persisted trips + saved INNs, document linkage by trip UUID and the prohibition on mock trip truth.
+- Golden trip propagation has an explicit regression contract covering creation/status mutation events, Dashboard/global-search/Core/Finance refresh, directory derivation from persisted trips + saved INNs, document linkage by trip UUID and the prohibition on mock trip truth.
 - Complete-trip pagination is shared by DashboardLiveSummary, global search, Finance, Core and Documents, removing the known first-100 truncation from business totals, search and document-to-trip selection.
 - `src/tripData.js` follows `/api/trips` pagination until the persisted set is complete, rejects invalid pagination and caps client aggregation at 5000 rows pending future server aggregation.
 - Trip create UI sends a stable `Idempotency-Key`; production migration 006 was applied with owner approval and server-side trip-create idempotency is connected and locked by regression contracts.
@@ -45,11 +45,11 @@ STATUS: IN_PROGRESS
 - Narrow-mobile navigation is locked by regression coverage for viewport reachability, scrolling and z-index ordering.
 - Driver account groundwork includes tenant-safe user→driver linkage and a dedicated driver-trip API contract; production auth activation remains gated.
 - Vercel Hobby function-count regression was recovered by consolidating 1C readiness into `api/catalog.js`; production remains within the 12-function limit.
-- Current LOGIX main is `ed3cb088849f494640a88f29eef71b6a6cd76cb1` (`test(idempotency): lock enabled production contract`).
-- Exact-head LOGIX Quality run #324 completed successfully for `ed3cb088849f494640a88f29eef71b6a6cd76cb1`.
-- Production deployment `dpl_C14HBiiZc8zo4eVghnVRmZ1GxPJn` for the same exact head is READY and targets production.
-- Production `/api/health` returned HTTP 200 on 2026-09-18 with `database=ok`, `authMode=demo`, exact `commitSha=ed3cb088849f494640a88f29eef71b6a6cd76cb1`; observed DB latency was 674 ms.
-- Runtime error review for the last 24h shows no application exception cluster; the only grouped signal is Node `DEP0169` (`url.parse()` deprecation) across existing API routes. It remains investigation-only until dependency/stack evidence identifies an actionable source.
+- Current LOGIX main is `666a4174047f18555b8a31af440b72086deed1ca` (`test(core): lock live trip propagation`).
+- Exact-head LOGIX Quality run #327 completed successfully for `666a4174047f18555b8a31af440b72086deed1ca`.
+- Production deployment `dpl_DJsUXr5XBZytHnWU6Rk65F9FzVkD` for the same exact head is READY and targets production.
+- Production `/api/health` returned HTTP 200 on 2026-09-18 with `database=ok`, `authMode=demo`, exact `commitSha=666a4174047f18555b8a31af440b72086deed1ca`; observed DB latency was 1170 ms.
+- Runtime error review for the last 24h shows no application exception cluster; the only grouped signal is Node `DEP0169` (`url.parse()` deprecation), 48 occurrences across existing API routes. Repository search finds no direct `url.parse` use, so it remains dependency/stack investigation rather than a safe source edit.
 - Core Analytics/1C/Notifications, Finance and Documents consume `fetchAllTrips()` rather than a first-page trip fetch; no new completeness defect was found in this verification pass.
 - No destructive DB/data operation, secret rotation, external 1C/EPD transaction or mandatory-auth switch was performed in this cycle.
 
