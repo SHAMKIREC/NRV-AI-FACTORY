@@ -4,31 +4,33 @@ ROLE: REVIEWER
 STATUS: IN_PROGRESS
 QUALITY_PROFILE: BUSINESS_APP
 
-## Current verified checkpoint — 2026-09-17
+## Current verified checkpoint — 2026-09-18
 
 Reviewer verification was refreshed against the actual current LOGIX main head.
 
-- Current verified LOGIX head is `bced74f57327e82f4e218a27a68d28424e8eb7b6` (`test(mobile): lock authoritative cascade and drawer reachability`).
-- GitHub Actions run `35225977363` / #300 completed SUCCESS for that exact head.
-- Exact-head production Vercel deployment `dpl_CVfm8NnCN68Gqq2kThNqDcFWxE5f` is READY and points to the same commit SHA.
-- Canonical production `/api/health` returned HTTP 200 with `database: ok`, `authMode: demo`, matching `commitSha: bced74f57327e82f4e218a27a68d28424e8eb7b6`; owner developer/demo access remains active without registration.
+- Previous fully verified LOGIX checkpoint is `bced74f57327e82f4e218a27a68d28424e8eb7b6`; GitHub Actions #300, exact production deployment and `/api/health` were green.
+- Current LOGIX head is `693eb3aede71d0d62c15b719b688e5b26936a8be` after hardening trip-create idempotency expiry semantics and aligning both mutation contract suites.
+- Production Vercel deployment for the preceding implementation/test head `c1cc9320ca35c21ee455922097a44b30b9756682` is READY with exactly 12 Node functions; canonical `/api/health` returned HTTP 200, `database: ok`, `authMode: demo`, matching commit SHA and preserved owner developer bypass.
+- A real idempotency defect was found: expired registry rows were ignored by the initial replay lookup but still blocked the unique insert, allowing an expired key to remain effectively unusable. `api/trips.js` now atomically reclaims only expired `(organization_id, scope, idempotency_key)` rows via `ON CONFLICT ... DO UPDATE ... WHERE expires_at<=now()`, clears stale response/resource fields and renews the 24-hour lease.
+- Active keys remain protected: same payload replays the stored response, a different payload conflicts, and an in-flight active reservation cannot be overwritten.
+- GitHub Actions #320 exposed one stale contract that still required `DO NOTHING`; no product defect was indicated. The stale assertion was updated in `test/tripMutationContracts.test.js`; exact-head run #321 is the active verification gate.
 - Role visibility/action contract remains frozen in `docs/ROLE_MATRIX.md`: Developer owner, Admin, Dispatcher, Accountant and Viewer. Document mutations and trip POST/PATCH enforce the server role guard. Mandatory user auth remains disabled.
-- Complete-trip pagination is shared by DashboardLiveSummary, global search, Finance and Core (Analytics/1C/Notifications/Settings), removing the known first-100 truncation from business totals and search.
-- Trip create UI sends a stable `Idempotency-Key`; production migration 006 was applied with owner approval and server-side trip-create idempotency is connected and regression-tested.
+- Complete-trip pagination is shared by DashboardLiveSummary, global search, Finance, Core, Documents and Directory, removing known first-100 truncation from business totals/search/derived relations.
+- Trip create UI sends a stable `Idempotency-Key`; production migration 006 was previously applied with owner approval and server-side trip-create idempotency is connected.
 - The guarded compound trip-start workflow allows a fully assigned draft to start without surfacing the invalid `draft → in_transit` transition error while retaining ordinary transition validation.
 - Desktop production E2E covers all connected business areas through canonical navigation. Mobile E2E covers Trips → Documents → Counterparties → Finance, persistent global drawer access and no document-level horizontal overflow.
 - Recoverable negative-state browser coverage exists for Documents, Trips, Directory, Finance and Core; isolated empty-state fixtures cover Documents and Counterparties.
 - Golden trip propagation remains explicitly locked by regression contracts across creation/status mutation events, Dashboard/global search, derived directories and document linkage by persisted trip UUID.
-- Narrow-mobile drawer reachability is now protected both by the authoritative final mobile CSS layer and by `test/mobileCascadeContracts.test.js`, which locks cascade order, viewport scrolling, touch-height rules and explicit menu/backdrop/sidebar stacking.
-- Vercel runtime error aggregation previously showed one recurring Node `DEP0169 url.parse()` deprecation warning group on API routes. Repository search finds no direct `url.parse` usage, so this remains dependency/runtime-origin evidence rather than a reason for speculative application changes.
-- No production records were created/deleted by this verification pass. No destructive DB/data operation, secret rotation, external provider transaction or mandatory-auth switch was performed.
+- Narrow-mobile drawer reachability is protected by the authoritative final mobile CSS layer and `test/mobileCascadeContracts.test.js`.
+- No production records were created/deleted by this verification pass. No destructive DB/data operation, secret rotation, external provider transaction, new migration or mandatory-auth switch was performed.
 
 ## Latest autonomous cycle
 
-- Promoted `bced74f5...` to the fully verified checkpoint after exact-head GitHub Actions #300, production deployment and canonical health all passed.
-- Confirmed `/api/health` database connectivity and owner demo bypass on the deployed exact commit.
-- Confirmed the latest mobile hardening is regression-locked instead of relying on an untested CSS hotfix.
-- Synchronized Factory task/report state to the actual production head so later agents do not regress to the stale #298/#299 checkpoint.
+- Audited the server-side trip-create idempotency path after migration 006 activation.
+- Fixed expired-key reuse atomically without deleting business data or weakening active duplicate protection.
+- Added/updated regression contracts for expired-key reuse and active reservation behavior.
+- Verified the deployment reached Vercel READY and canonical health remained 200 on the implementation/test head.
+- CI #320 failed only on a stale source-contract assertion; aligned that test and launched exact-head CI #321.
 
 ## Previously verified architecture/security state still applicable
 
@@ -48,7 +50,7 @@ P1 / release boundary:
 
 P2 / frontend and state coverage:
 - Continue explicit loading/empty/error acceptance for every workspace owner.
-- Mobile/dashboard CSS is still fragmented across a historical chain of overrides. Consolidation must be incremental and regression-tested; blind deletion is prohibited.
+- Mobile/dashboard CSS remains partially fragmented. Consolidation must stay incremental and regression-tested; blind deletion is prohibited.
 - Narrow-mobile overlap/density remains the priority visual cleanup area, with drawer reachability and touch targets preserved.
 
 P2 / performance/runtime:
@@ -67,4 +69,4 @@ Owner/external approval gates:
 
 ## Reviewer decision
 
-LOGIX-004 remains IN_PROGRESS. Current main `bced74f5...` is fully verified across CI, exact production deployment and health, preserves the owner developer bypass, and has regression coverage for the latest mobile drawer fix. Meaningful autonomous frontend/acceptance work remains, so no owner notification is required yet.
+LOGIX-004 remains IN_PROGRESS. The idempotency expiry defect is fixed and deployed; exact-head CI #321 is still the active verification gate. Owner developer bypass remains intact and no owner-dependent action is required from this cycle yet.
