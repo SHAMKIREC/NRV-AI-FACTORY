@@ -43,12 +43,14 @@ STATUS: IN_PROGRESS
 - Trip start workflow allows a fully assigned draft to start without exposing the invalid `draft → in_transit` transition error; ordinary status transition protection remains enforced.
 - Role visibility/action contract is frozen in `docs/ROLE_MATRIX.md`; developer/demo bypass remains allowed and mandatory auth remains disabled.
 - Narrow-mobile navigation is locked by regression coverage for viewport reachability, scrolling and z-index ordering.
-- Driver account groundwork now includes tenant-safe user→driver linkage and a dedicated driver-trip API contract; production auth activation remains gated.
-- P0 deployment regression found on 2026-09-18: adding `api/driver-trips.js` raised Vercel Hobby serverless functions to 13 and exact-head deployments failed with `exceeded_serverless_functions_per_deployment` (limit 12).
-- Safe recovery implemented without removing product capability: 1C readiness moved into the existing tenant-scoped `api/catalog.js` function behind `view=integration1c`; `vercel.json` preserves the public `/api/integration-1c` route via rewrite; redundant `api/integration-1c.js` was removed. Production is back to exactly 12 Node functions.
-- Production deployment for recovery head `814c9e2a98cc5b5bece60dde07845542d7a75c08` is READY and owns `logix-indol.vercel.app`; `/api/health` returned HTTP 200 with `database=ok`, `authMode=demo`, exact `commitSha=814c9e2a98cc5b5bece60dde07845542d7a75c08` and 119 ms DB latency.
-- Exact-head CI verification is complete: LOGIX Quality run #310 for `814c9e2a98cc5b5bece60dde07845542d7a75c08` completed successfully, closing the recovery verification gate.
-- Core Analytics/1C/Notifications already consume `fetchAllTrips()` rather than a first-page trip fetch; no additional completeness change was required in that workspace during this pass.
+- Driver account groundwork includes tenant-safe user→driver linkage and a dedicated driver-trip API contract; production auth activation remains gated.
+- Vercel Hobby function-count regression was recovered by consolidating 1C readiness into `api/catalog.js`; production remains within the 12-function limit.
+- Current LOGIX main is `ed3cb088849f494640a88f29eef71b6a6cd76cb1` (`test(idempotency): lock enabled production contract`).
+- Exact-head LOGIX Quality run #324 completed successfully for `ed3cb088849f494640a88f29eef71b6a6cd76cb1`.
+- Production deployment `dpl_C14HBiiZc8zo4eVghnVRmZ1GxPJn` for the same exact head is READY and targets production.
+- Production `/api/health` returned HTTP 200 on 2026-09-18 with `database=ok`, `authMode=demo`, exact `commitSha=ed3cb088849f494640a88f29eef71b6a6cd76cb1`; observed DB latency was 674 ms.
+- Runtime error review for the last 24h shows no application exception cluster; the only grouped signal is Node `DEP0169` (`url.parse()` deprecation) across existing API routes. It remains investigation-only until dependency/stack evidence identifies an actionable source.
+- Core Analytics/1C/Notifications, Finance and Documents consume `fetchAllTrips()` rather than a first-page trip fetch; no new completeness defect was found in this verification pass.
 - No destructive DB/data operation, secret rotation, external 1C/EPD transaction or mandatory-auth switch was performed in this cycle.
 
 ## Current priority queue
