@@ -29,39 +29,37 @@ ACCEPTANCE_CRITERIA:
 TEST_REQUIREMENTS: npm test; npm run build; API smoke; Vercel deploy check; security negative-case review; mobile/visual review доступными средствами; diff review.
 STATUS: IN_PROGRESS
 
-## Current cycle checkpoint — 2026-09-18
+## Current cycle checkpoint — 2026-09-19
 
 - Center inventory/acceptance and real navigation ownership are synchronized with current LOGIX.
 - Owner developer/demo bypass remains intact and explicitly covered; it is not represented as completed production user authorization.
 - Desktop production smoke opens all connected workspaces through canonical navigation.
-- Mobile production smoke verifies Trips → Documents → Counterparties → Finance, persistent drawer access and no document-level horizontal overflow.
-- Recoverable negative-state browser coverage exists for Documents, Trips, Directory, Finance and Core; isolated empty-state fixtures cover Documents and Counterparties.
-- Golden trip propagation has an explicit regression contract covering creation/status mutation events, Dashboard/global-search/Core/Finance refresh, directory derivation from persisted trips + saved INNs, document linkage by trip UUID and the prohibition on mock trip truth.
-- Complete-trip pagination is shared by DashboardLiveSummary, global search, Finance, Core, Documents and Directory, removing the known first-100 truncation from business totals, search, document-to-trip selection and derived relations.
-- `src/tripData.js` follows `/api/trips` pagination until the persisted set is complete, rejects invalid pagination and caps client aggregation at 5000 rows pending future server aggregation.
-- Trip create UI sends a stable `Idempotency-Key`; production migration 006 was applied with owner approval and server-side trip-create idempotency is connected and locked by regression contracts, including expired-key reuse.
-- Trip start workflow allows a fully assigned draft to start without exposing the invalid `draft → in_transit` transition error; ordinary status transition protection remains enforced.
-- Role visibility/action contract is frozen in `docs/ROLE_MATRIX.md`; developer/demo bypass remains allowed and mandatory auth remains disabled.
-- Narrow-mobile navigation is locked by regression coverage for viewport reachability, scrolling, z-index ordering and deterministic dismissal. Escape closes the drawer and the trigger exposes `aria-expanded`/`aria-controls`.
-- Driver account groundwork includes tenant-safe user→driver linkage and a dedicated driver-trip API contract; production auth activation remains gated.
-- Vercel Hobby function-count regression was recovered by consolidating 1C readiness into `api/catalog.js`; production remains within the 12-function limit.
-- Current LOGIX `main` is `ecc123cf9d3a322943e3c327b5ceff2005e93a9e`.
-- Exact-head LOGIX Quality run #329 (`35369465955`) completed successfully.
-- Exact-head production deployment `dpl_CRkJicMTH9poGktNF6DE2QfJxCPr` is READY and targets production with 12 Node functions.
-- Canonical `/api/health` returned HTTP 200 with `database=ok`, `authMode=demo` and `commitSha=ecc123cf9d3a322943e3c327b5ceff2005e93a9e`, closing the previous exact-head verification gate.
-- Runtime error review previously showed no application exception cluster; Node `DEP0169` remains dependency/stack investigation because repository evidence does not identify application `url.parse` use.
-- Core Analytics/1C/Notifications, Finance, Documents and Directory consume `fetchAllTrips()` where complete persisted totals/relations are required. Current Core re-audit found no new completeness defect.
-- Mobile CSS re-audit confirms `mobile-overrides.css` is the authoritative final product CSS import. `mobile-production.css` still owns non-duplicated workspace sizing/density rules, so wholesale deletion is unsafe; consolidation remains incremental.
+- Mobile production coverage verifies workspace navigation, drawer reachability/dismissal and no document-level horizontal overflow.
+- Golden trip propagation has regression coverage across Dashboard, global search, Core, Finance, Directory and Documents.
+- Complete-trip pagination is shared by DashboardLiveSummary, global search, Finance, Core, Documents and Directory. `test/allTripConsumersContracts.test.js` now locks the complete persisted trip reader contract and prevents accidental return to first-100 business totals.
+- `src/tripData.js` follows `/api/trips` pagination until complete, rejects invalid pagination and caps client aggregation at 5000 rows pending future server aggregation.
+- Trip create UI/server idempotency is production-enabled; migration 006 was applied earlier with owner approval and expired-key reuse is covered.
+- Trip start workflow supports an assigned draft without exposing the invalid `draft → in_transit` error while ordinary transition protection remains enforced.
+- Role visibility/action contract is frozen; developer/demo bypass remains allowed and mandatory auth remains disabled.
+- Narrow-mobile navigation is protected by regression tests for viewport reachability, scrolling, z-index ordering, dismissal and trigger accessibility state.
+- Driver account groundwork remains tenant-safe; production auth activation stays gated.
+- Vercel Hobby deployment remains within the 12 Node function limit.
+- Current LOGIX `main` is `4e99846166abd63867ef7bb519c45215e783609e`.
+- Exact-head LOGIX Quality run #332 (`35382897990`) completed successfully.
+- Exact-head production deployment `dpl_5mbsPwyNVTQ3zmXFh5Mc6y9ZdBAq` is READY and targets production with commit `4e99846166abd63867ef7bb519c45215e783609e`.
+- Canonical `https://logix-indol.vercel.app/api/health` returned HTTP 200 with `database=ok`, `authMode=demo` and exact `commitSha=4e99846166abd63867ef7bb519c45215e783609e` on 2026-09-18T20:07Z.
+- Runtime error aggregation shows no application exception cluster. The only current group is Node `DEP0169` (`url.parse()` deprecation), seen across API routes; repository inspection still has no evidence of application-owned `url.parse` use, so dependency/stack attribution is required before changing code.
+- `CorePortal.jsx` uses `fetchAllTrips()` for Analytics/1C/Notifications and no direct first-100 fetch remains in the audited complete-trip consumers.
+- Mobile CSS remains intentionally layered: `mobile-overrides.css` is authoritative last, while `mobile-production.css` still owns non-duplicated workspace sizing/density rules. Wholesale deletion remains unsafe.
 - No destructive DB/data operation, secret rotation, external 1C/EPD transaction, billing activation or mandatory-auth switch was performed in this cycle.
 
 ## Current priority queue
 
 1. Continue explicit loading/empty/error acceptance for every workspace owner and fix only reproducible gaps.
-2. Consolidate the historical mobile CSS chain incrementally with regression QA; prioritize narrow-mobile overlap/density while preserving drawer reachability and touch targets.
-3. Continue audit for any remaining trip consumers that require complete persisted totals; do not replace intentionally paginated list views.
-4. Add isolated/synthetic mutation E2E only when it can avoid persistent production data; do not mutate real production records merely to satisfy a test.
-5. Trace the runtime `DEP0169` warning only when stack/dependency evidence identifies an actionable source.
-6. Review MapLibre map-specific loading/performance without regressing lazy loading.
-7. Complete backup/restore policy, access-audit procedure and recovery-drill documentation for commercial readiness.
-8. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
-9. Mandatory user auth remains rollout gated and must retain owner developer access.
+2. Consolidate historical mobile CSS incrementally with regression QA; preserve drawer reachability, safe areas and touch targets.
+3. Add isolated/synthetic mutation E2E only when it cannot persist production data.
+4. Trace Node `DEP0169` only when stack/dependency evidence identifies an actionable source; do not guess-rewrite API URL handling.
+5. Review MapLibre map loading/performance without regressing lazy loading.
+6. Complete backup/restore policy, access-audit procedure and recovery-drill documentation for commercial readiness.
+7. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
+8. Mandatory user auth remains rollout gated and must retain owner developer access.
