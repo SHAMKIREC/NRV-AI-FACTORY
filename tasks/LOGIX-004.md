@@ -45,21 +45,23 @@ STATUS: IN_PROGRESS
 - Narrow-mobile navigation is locked by regression coverage for viewport reachability, scrolling and z-index ordering.
 - Driver account groundwork includes tenant-safe user→driver linkage and a dedicated driver-trip API contract; production auth activation remains gated.
 - Vercel Hobby function-count regression was recovered by consolidating 1C readiness into `api/catalog.js`; production remains within the 12-function limit.
-- Current LOGIX main is `666a4174047f18555b8a31af440b72086deed1ca` (`test(core): lock live trip propagation`).
 - Exact-head LOGIX Quality run #327 completed successfully for `666a4174047f18555b8a31af440b72086deed1ca`.
-- Production deployment `dpl_DJsUXr5XBZytHnWU6Rk65F9FzVkD` for the same exact head is READY and targets production.
-- Production `/api/health` returned HTTP 200 on 2026-09-18 with `database=ok`, `authMode=demo`, exact `commitSha=666a4174047f18555b8a31af440b72086deed1ca`; observed DB latency was 1170 ms.
-- Runtime error review for the last 24h shows no application exception cluster; the only grouped signal is Node `DEP0169` (`url.parse()` deprecation), 48 occurrences across existing API routes. Repository search finds no direct `url.parse` use, so it remains dependency/stack investigation rather than a safe source edit.
-- Core Analytics/1C/Notifications, Finance and Documents consume `fetchAllTrips()` rather than a first-page trip fetch; no new completeness defect was found in this verification pass.
+- Production deployment `dpl_DJsUXr5XBZytHnWU6Rk65F9FzVkD` for `666a4174047f18555b8a31af440b72086deed1ca` was READY and targeted production; `/api/health` returned HTTP 200 with `database=ok`, `authMode=demo`.
+- Runtime error review for the last 24h showed no application exception cluster; the only grouped signal was Node `DEP0169` (`url.parse()` deprecation). Repository search found no direct `url.parse` use, so it remains dependency/stack investigation rather than a safe source edit.
+- Core Analytics/1C/Notifications, Finance and Documents consume `fetchAllTrips()` rather than a first-page trip fetch; no new completeness defect was found in that verification pass.
+- Live non-destructive browser QA of the mobile drawer exposed a dismissal/accessibility weakness: Escape did not close the drawer reliably during navigation attempts.
+- LOGIX main now includes `237201169acd1382b785cb5c901e85403e172ca8` (`fix(mobile): make drawer dismissible and stateful`): drawer closes on Escape, footer Settings navigation closes it even when already on Settings, and the trigger exposes `aria-expanded`/`aria-controls`.
+- Regression contract `ecc123cf9d3a322943e3c327b5ceff2005e93a9e` (`test(mobile): lock drawer dismissal contract`) locks the mobile drawer behavior. LOGIX Quality run #329 is queued/pending for this exact head; production deployment/health must be re-verified after it becomes green.
 - No destructive DB/data operation, secret rotation, external 1C/EPD transaction or mandatory-auth switch was performed in this cycle.
 
 ## Current priority queue
 
-1. Continue explicit loading/empty/error acceptance for every workspace owner and fix only reproducible gaps.
-2. Consolidate the historical mobile CSS chain incrementally with regression QA; prioritize narrow-mobile overlap/density while preserving drawer reachability and touch targets.
-3. Continue audit for any remaining trip consumers that require complete persisted totals; do not replace intentionally paginated list views.
-4. Add isolated/synthetic mutation E2E only when it can avoid persistent production data; do not mutate real production records merely to satisfy a test.
-5. Trace the runtime `DEP0169` warning only when stack/dependency evidence identifies an actionable source.
-6. Review MapLibre map-specific loading/performance without regressing lazy loading.
-7. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
-8. Mandatory user auth remains rollout gated and must retain owner developer access.
+1. Finish exact-head CI + production deployment/health verification for `ecc123cf9d3a322943e3c327b5ceff2005e93a9e`; fix any regression before continuing.
+2. Continue explicit loading/empty/error acceptance for every workspace owner and fix only reproducible gaps.
+3. Consolidate the historical mobile CSS chain incrementally with regression QA; prioritize narrow-mobile overlap/density while preserving drawer reachability and touch targets.
+4. Continue audit for any remaining trip consumers that require complete persisted totals; do not replace intentionally paginated list views.
+5. Add isolated/synthetic mutation E2E only when it can avoid persistent production data; do not mutate real production records merely to satisfy a test.
+6. Trace the runtime `DEP0169` warning only when stack/dependency evidence identifies an actionable source.
+7. Review MapLibre map-specific loading/performance without regressing lazy loading.
+8. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
+9. Mandatory user auth remains rollout gated and must retain owner developer access.
