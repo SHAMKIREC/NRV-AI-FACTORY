@@ -9,23 +9,31 @@
 - Developer: ChatGPT / compatible coding agent
 - Reviewer: independent review pass
 
-## Фактическое состояние на старте LOGIX-004
+## Фактическое состояние LOGIX-004
 
-Старый blocker `AUTH_PROVIDER_OR_IDENTITY_MODEL` больше не описывает текущее состояние кода. В LOGIX уже добавлены Neon Auth-интеграционный контур, server request context, связь `public.users.auth_user_id -> organization_id/role`, same-origin auth endpoints и отдельный developer/demo bypass для владельца. При этом production сейчас намеренно остаётся в developer/demo режиме, поэтому реальную пользовательскую authorization нельзя считать полностью введённой, пока обязательный auth mode не включён и не пройдены negative-case/E2E проверки.
+LOGIX уже имеет Neon Auth-интеграционный контур, server request context, tenant/role contract и отдельный developer/demo bypass владельца. Production намеренно остаётся в developer/demo режиме: обязательная пользовательская authorization не считается введённой и не включается без отдельного безопасного rollout, сохраняющего доступ владельца.
 
-Также уже выполнены: UUID/FK для `trip_documents.trip_id`, lazy loading тяжёлых разделов, cleanup старых DOM/click interceptors, production health endpoint, lifecycle rules рейсов, server-side validation и часть rate-limit/cache защиты.
+Миграция 006 для идемпотентности создания рейса применена ранее с явным разрешением владельца. Создание рейса защищено tenant-scoped idempotency contract; complete-trip pagination используется бизнес-потребителями вместо первых 100 записей. Реальные 1С, ИС ЭПД/УКЭП и коммерческий billing остаются readiness-only до появления фактических внешних параметров.
 
-## Текущий проход
+Покрыты desktop/mobile navigation, owner developer bypass, golden trip propagation, mobile drawer reachability/dismissal, loading/error/empty состояния основных workspace owners, production health и operations recovery/access-audit documentation. Recovery drill не выполнялся и не заявляется выполненным.
 
-LOGIX-004 обязан провести FULL AUDIT + AUTOFIX + VERIFY по NRV-TOOLKIT и ECC: architecture, backend/API, auth/data isolation, security, tests, mobile/desktop UX, accessibility, performance, dependencies, deployment и документацию.
+## Последняя подтверждённая точка — 2026-09-19
 
-### Последняя подтверждённая точка — 2026-09-17
-
-- LOGIX head `75600bcfa9f556124c5e946c724f152910cbff46` (`fix(mobile): keep full navigation reachable in viewport`).
-- GitHub Actions `LOGIX Quality` #299 завершён SUCCESS.
-- Vercel production deployment `dpl_87ekkF4VxbQ8WRH2XQ8MXQkacxgZ` для этого же SHA имеет состояние READY.
-- `https://logix-indol.vercel.app/api/health` отвечает HTTP 200, `database=ok`, `authMode=demo`, `commitSha=75600bcfa9f556124c5e946c724f152910cbff46`.
+- Последний полностью подтверждённый production head до текущего тестового прохода: `614c75230bab18c32d8b32072db2bca4a1007706`; LOGIX Quality #335 завершён SUCCESS, Vercel production READY.
+- Текущий LOGIX head: `4b1fb7491a2bc8e528491df0ee09c3b71600c066` (`test(e2e): align directory empty-state copy`).
+- Добавлен отдельный browser-fixture matrix для оставшихся truthful workspace states: ЭПД empty/readiness, Водители/Автопарк empty, Уведомления/Настройки recoverable API failure.
+- Для промежуточного `cd4647fc5dde73ea6ab2a80354a37b38a8f8db8a` npm test и npm run build уже прошли; exact production deployment READY и `/api/health` вернул HTTP 200, `database=ok`, `authMode=demo`, `commitSha=cd4647fc5dde73ea6ab2a80354a37b38a8f8db8a`.
+- Текущий exact-head `4b1fb7491a2bc8e528491df0ee09c3b71600c066` проходит LOGIX Quality #337; его Vercel deployment создан и ожидает финального exact-head VERIFY.
+- Runtime aggregation за последние 24 часа не показывает application exception cluster; остаётся только Node `DEP0169` по `url.parse()`, источник которого не меняется без stack/dependency evidence.
 - Developer/demo bypass владельца сохранён; обязательная пользовательская авторизация не включалась.
+
+## Следующий безопасный приоритет
+
+1. Завершить exact-head CI/Vercel/browser verification для `4b1fb7491a2bc8e528491df0ee09c3b71600c066`.
+2. Продолжить MapLibre-specific loading/performance review без регрессии lazy workspace loading.
+3. Консолидировать historical mobile CSS только малыми доказуемыми шагами с regression QA.
+4. Добавлять synthetic mutation E2E только без записи production data.
+5. Не выполнять recovery restore, destructive DB/data operations, secret rotation или mandatory-auth activation без отдельного разрешения.
 
 ## Важное правило
 
