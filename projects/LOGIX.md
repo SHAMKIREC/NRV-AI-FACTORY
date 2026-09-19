@@ -19,21 +19,22 @@ LOGIX уже имеет Neon Auth-интеграционный контур, ser
 
 ## Последняя подтверждённая точка — 2026-09-19
 
-- Последний полностью подтверждённый production head до текущего тестового прохода: `614c75230bab18c32d8b32072db2bca4a1007706`; LOGIX Quality #335 завершён SUCCESS, Vercel production READY.
-- Текущий LOGIX head: `4b1fb7491a2bc8e528491df0ee09c3b71600c066` (`test(e2e): align directory empty-state copy`).
-- Добавлен отдельный browser-fixture matrix для оставшихся truthful workspace states: ЭПД empty/readiness, Водители/Автопарк empty, Уведомления/Настройки recoverable API failure.
-- Для промежуточного `cd4647fc5dde73ea6ab2a80354a37b38a8f8db8a` npm test и npm run build уже прошли; exact production deployment READY и `/api/health` вернул HTTP 200, `database=ok`, `authMode=demo`, `commitSha=cd4647fc5dde73ea6ab2a80354a37b38a8f8db8a`.
-- Текущий exact-head `4b1fb7491a2bc8e528491df0ee09c3b71600c066` проходит LOGIX Quality #337; его Vercel deployment создан и ожидает финального exact-head VERIFY.
-- Runtime aggregation за последние 24 часа не показывает application exception cluster; остаётся только Node `DEP0169` по `url.parse()`, источник которого не меняется без stack/dependency evidence.
+- LOGIX Quality #339 завершён SUCCESS на `26a3e1cb72fb1a0529e1e7e4f55781608495165d` (`test(e2e): cover analytics empty and 1c failure states`).
+- Workspace state matrix покрывает truthful empty/error states для ЭПД, Водителей, Автопарка, Аналитики, 1С, Уведомлений и Настроек без production mutation.
+- Текущий verification candidate: `97b4b5488956dd9750a17090c5520862d653d027` (`test(e2e): verify 1c recovery retry path`). Он расширяет 1С negative-state проверку: после синтетического HTTP 503 кнопка «Повторить» должна реально восстановить readiness UI при успешном повторе, а не только присутствовать визуально.
+- Изменение `97b4b548...` затрагивает только Playwright fixture test и не пишет production data.
+- Exact-head CI/Vercel verification для `97b4b548...` ещё не зафиксирован; до него commit не считается подтверждённой production точкой.
+- Runtime aggregation ранее не показывал application exception cluster; остаётся Node `DEP0169` по `url.parse()`, источник которого не меняется без stack/dependency evidence.
 - Developer/demo bypass владельца сохранён; обязательная пользовательская авторизация не включалась.
 
 ## Следующий безопасный приоритет
 
-1. Завершить exact-head CI/Vercel/browser verification для `4b1fb7491a2bc8e528491df0ee09c3b71600c066`.
-2. Продолжить MapLibre-specific loading/performance review без регрессии lazy workspace loading.
-3. Консолидировать historical mobile CSS только малыми доказуемыми шагами с regression QA.
-4. Добавлять synthetic mutation E2E только без записи production data.
-5. Не выполнять recovery restore, destructive DB/data operations, secret rotation или mandatory-auth activation без отдельного разрешения.
+1. Завершить exact-head CI/Vercel/browser verification для `97b4b5488956dd9750a17090c5520862d653d027`; исправлять только воспроизводимый дефект.
+2. Продолжить explicit retry/loading/empty/error acceptance для workspace states, где поведение ещё не изолировано fixtures.
+3. Продолжить MapLibre-specific loading/performance review без регрессии lazy workspace loading.
+4. Консолидировать historical mobile CSS только малыми доказуемыми шагами с regression QA.
+5. Добавлять synthetic mutation E2E только без записи production data.
+6. Не выполнять recovery restore, destructive DB/data operations, secret rotation или mandatory-auth activation без отдельного разрешения.
 
 ## Важное правило
 
