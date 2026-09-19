@@ -45,9 +45,9 @@ STATUS: IN_PROGRESS
 - Driver account groundwork remains tenant-safe; production auth activation stays gated.
 - Vercel Hobby deployment remains within the 12 Node function limit.
 - Operations readiness includes access-audit procedure, backup/restore evidence rules, post-recovery numbering/idempotency checks, truthful RPO/RTO handling and commercial-readiness evidence checklist. Recovery drill remains explicitly pending and was not executed.
-- `e2e/workspace-state-matrix.spec.js` now covers EPD empty/readiness, Drivers/Fleet empty states, Analytics truthful zero-data state, 1C recoverable failure, and Notifications/Settings recoverable failures without production mutation.
-- LOGIX Quality #338 completed successfully on `c6293210f34e68702b0ab698ab017646126ce386`.
-- Current verification candidate is `26a3e1cb72fb1a0529e1e7e4f55781608495165d` (`test(e2e): cover analytics empty and 1c failure states`); LOGIX Quality #339 is running exact-head verification.
+- `e2e/workspace-state-matrix.spec.js` covers EPD truthful empty/readiness and now an isolated recoverable EPD API failure with retry, Drivers/Fleet empty states, Analytics truthful zero-data state, 1C recoverable failure with retry, and Notifications/Settings recoverable failures without production mutation.
+- LOGIX Quality #340 completed successfully on `97b4b5488956dd9750a17090c5520862d653d027`, including the 1C recovery retry path.
+- Current verification candidate is `6cb008e236b7462732af114a1f11e42bed9e77a9` (`test(e2e): cover epd recoverable failure state`); LOGIX Quality #341 is running exact-head verification.
 - Runtime error aggregation shows no application exception cluster. The only tracked group is Node `DEP0169` (`url.parse()` deprecation); repository inspection has no evidence of application-owned `url.parse` use, so dependency/stack attribution is required before changing code.
 - `CorePortal.jsx` uses `fetchAllTrips()` for Analytics/1C/Notifications and no direct first-100 fetch remains in audited complete-trip consumers.
 - `WorkspaceRouter.jsx` lazy-loads `TripsPortal`; MapLibre remains imported inside the Trips workspace bundle and is queued for deeper map-specific deferred-loading review.
@@ -56,7 +56,7 @@ STATUS: IN_PROGRESS
 
 ## Current priority queue
 
-1. Finish exact-head verification for the expanded workspace state matrix and fix only reproducible failures.
+1. Finish exact-head verification for the EPD recoverable-state test and fix only reproducible failures.
 2. Continue explicit loading/empty/error acceptance for any workspace state not yet isolated by fixtures; fix only reproducible gaps.
 3. Consolidate historical mobile CSS incrementally with regression QA; preserve drawer reachability, safe areas and touch targets.
 4. Add isolated/synthetic mutation E2E only when it cannot persist production data.
