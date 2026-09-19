@@ -45,9 +45,8 @@ STATUS: IN_PROGRESS
 - Vercel Hobby deployment remains within the 12 Node function limit.
 - Operations readiness includes access-audit procedure, backup/restore evidence rules, post-recovery numbering/idempotency checks, truthful RPO/RTO handling and commercial-readiness evidence checklist. Recovery drill remains explicitly pending and was not executed.
 - `e2e/workspace-state-matrix.spec.js` covers truthful empty/error/retry behavior for EPD, Drivers/Fleet, Analytics, 1C, Notifications and Settings without production mutation.
-- LOGIX Quality #345 on `2b20f7767486fe79e1204271dd33acbebbee7e7f` passed all 129 unit/contract tests, build and exact-production deployment wait. Browser QA found two deterministic fixture sequencing defects: a second sidebar click while full-screen Directory covered navigation, and a one-shot Core `/api/trips` failure racing dashboard bootstrap.
-- Candidate `e36602ebef70cfe1d0253576eb5dc9818bbd9919` fixes only those E2E fixture-isolation defects: shell readiness is awaited before arming transient failure and the canonical shell is reloaded between Drivers and Fleet. Production business code is unchanged.
-- LOGIX Quality #346 for `e36602ebef70cfe1d0253576eb5dc9818bbd9919` is currently running exact-head verification.
+- The transient workspace-fixture race was isolated and fixed without changing production business behavior. The failure route is armed only after workspace readiness so dashboard bootstrap cannot consume it accidentally.
+- Current LOGIX head is `6011aa075e36a194888ec5dfceff61931db97877` (`test(e2e): arm transient failures after workspace readiness`). LOGIX Quality #350 completed successfully on this exact head, including tests/build and the workflow's deployment/browser verification gates.
 - Runtime error aggregation shows no application exception cluster. The tracked Node `DEP0169` (`url.parse()`) deprecation still lacks evidence of application-owned usage.
 - `CorePortal.jsx` uses `fetchAllTrips()` for Analytics/1C/Notifications and no direct first-100 fetch remains in audited complete-trip consumers.
 - `WorkspaceRouter.jsx` lazy-loads `TripsPortal`; MapLibre remains imported inside the Trips workspace bundle and is queued for deeper map-specific deferred-loading review.
@@ -56,13 +55,12 @@ STATUS: IN_PROGRESS
 
 ## Current priority queue
 
-1. Finish exact-head verification for `e36602ebef70cfe1d0253576eb5dc9818bbd9919` / LOGIX Quality #346 and fix only reproducible failures.
-2. Continue explicit loading/empty/error acceptance for any workspace state not yet isolated by fixtures.
-3. Consolidate historical mobile CSS incrementally with regression QA; preserve drawer reachability, safe areas and touch targets.
-4. Add isolated/synthetic mutation E2E only when it cannot persist production data.
-5. Trace Node `DEP0169` only when stack/dependency evidence identifies an actionable source.
-6. Continue MapLibre map-specific loading/performance review without regressing lazy workspace loading.
-7. Execute the documented access audit only when mandatory-auth rollout rehearsal or commercial-readiness review is authorized.
-8. Prepare a recovery drill only on an isolated target and only after owner approval; do not restore production automatically.
-9. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
-10. Mandatory user auth remains rollout gated and must retain owner developer access.
+1. Continue explicit loading/empty/error acceptance for any workspace state not yet isolated by fixtures.
+2. Consolidate historical mobile CSS incrementally with regression QA; preserve drawer reachability, safe areas and touch targets.
+3. Add isolated/synthetic mutation E2E only when it cannot persist production data.
+4. Trace Node `DEP0169` only when stack/dependency evidence identifies an actionable source.
+5. Continue MapLibre map-specific loading/performance review without regressing lazy workspace loading.
+6. Execute the documented access audit only when mandatory-auth rollout rehearsal or commercial-readiness review is authorized.
+7. Prepare a recovery drill only on an isolated target and only after owner approval; do not restore production automatically.
+8. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
+9. Mandatory user auth remains rollout gated and must retain owner developer access.
