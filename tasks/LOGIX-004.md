@@ -29,7 +29,7 @@ ACCEPTANCE_CRITERIA:
 TEST_REQUIREMENTS: npm test; npm run build; API smoke; Vercel deploy check; security negative-case review; mobile/visual review доступными средствами; diff review.
 STATUS: IN_PROGRESS
 
-## Current cycle checkpoint — 2026-09-19
+## Current cycle checkpoint — 2026-09-20
 
 - Center inventory/acceptance and real navigation ownership are synchronized with current LOGIX.
 - Owner developer/demo bypass remains intact and explicitly covered; it is not represented as completed production user authorization.
@@ -48,9 +48,11 @@ STATUS: IN_PROGRESS
 - `CorePortal.jsx`, `FinancePortal.jsx`, `DocumentsPortal.jsx` and `DirectoryPortal.jsx` all consume the shared complete-trip reader; no audited business summary is intentionally limited to the first 100 trips.
 - `TripsPortal.jsx` is workspace-lazy but still statically imports MapLibre inside the Trips chunk. This is a performance opportunity, not a correctness defect; do not rewrite the map path without bundle/runtime evidence.
 - Mobile CSS remains intentionally layered: `mobile-overrides.css` is authoritative last. The current drawer rules explicitly constrain the open sidebar to `100dvh`, make it scrollable, keep nav/footer reachable, and preserve z-index ordering over workspace portals.
-- Current LOGIX head is `bced74f57327e82f4e218a27a68d28424e8eb7b6` (`test(mobile): lock authoritative cascade and drawer reachability`). LOGIX Quality #300 (run 35225977363) completed SUCCESS on this exact head.
-- Current cycle found no new P0/P1 correctness defect in the audited complete-trip consumers. Factory state was advanced to the exact verified head rather than making a speculative production rewrite.
-- No destructive DB/data operation, secret rotation, external 1C/EPD transaction, billing activation or mandatory-auth switch was performed in this cycle.
+- Lazy workspace loading now exposes a polite atomic live-region status for assistive technology; this is an accessibility hardening, not a behavior change.
+- Current LOGIX head is `5bbfe80c7fff09d47aff07dc06c676027b75cb59` (`fix(a11y): announce lazy workspace loading`). LOGIX Quality #351 (run 35462209316) completed SUCCESS on this exact head.
+- Current cycle re-audited Core complete-trip usage and workspace-state coverage; no new P0/P1 correctness defect justified a speculative production rewrite.
+- Fresh direct `/api/health` retrieval could not be established through the available web path in this cycle, so health is not re-claimed without evidence; exact-head workflow remains green.
+- No destructive DB/data operation, secret rotation, migration, external 1C/EPD transaction, billing activation or mandatory-auth switch was performed in this cycle.
 
 ## Current priority queue
 
