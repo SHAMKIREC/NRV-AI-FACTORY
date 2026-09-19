@@ -6,13 +6,14 @@ QUALITY_PROFILE: BUSINESS_APP
 
 ## Current verified checkpoint — 2026-09-19
 
-- LOGIX product head advanced to `614c75230bab18c32d8b32072db2bca4a1007706` with an operations-readiness update only; no application runtime, schema, data, secret, auth mode or external provider behavior was changed by this commit.
-- The previous exact-head product state passed LOGIX Quality #334 on `dc9133bc52eb95624402062b83c495bbdeb3c52d`.
-- LOGIX Quality #335 is queued for exact head `614c75230bab18c32d8b32072db2bca4a1007706`; exact-head Vercel/health verification remains pending until that workflow/deployment completes.
-- `docs/OPERATIONS_READINESS.md` now contains an explicit access-audit procedure, recovery evidence requirements, post-recovery idempotency/numbering checks, truthful RPO/RTO handling, and a commercial-readiness evidence checklist.
-- Recovery readiness remains documented but drill-pending: no production restore or isolated recovery drill was executed.
+- LOGIX Quality #335 completed SUCCESS on `614c75230bab18c32d8b32072db2bca4a1007706`; its Vercel production deployment is READY.
+- Current product head is `4b1fb7491a2bc8e528491df0ee09c3b71600c066`.
+- A dedicated non-mutating browser-fixture state matrix was added for remaining workspace acceptance: EPD truthful empty/readiness state, Drivers/Fleet truthful empty states, and Notifications/Settings recoverable API failures.
+- The intermediate state `cd4647fc5dde73ea6ab2a80354a37b38a8f8db8a` already passed `npm test` and `npm run build`; its exact Vercel production deployment is READY and `/api/health` returned HTTP 200 with `database=ok`, `authMode=demo`, `commitSha=cd4647fc5dde73ea6ab2a80354a37b38a8f8db8a`.
+- Exact-head LOGIX Quality #337 for `4b1fb7491a2bc8e528491df0ee09c3b71600c066` is in progress; exact-head browser smoke remains pending until the workflow completes.
+- Runtime error aggregation for the last 24 hours still shows only Node `DEP0169` (`url.parse()` deprecation), not an application exception cluster. No repository-owned source is changed without stack/dependency attribution.
 - Owner developer/demo bypass remains protected and mandatory auth remains disabled.
-- No production data, schema, secret, external 1C/EPD transaction, billing activation or developer bypass was changed in this cycle.
+- No production data, schema, secret, external 1C/EPD transaction, billing activation, recovery restore or developer bypass was changed in this cycle.
 
 ## Product/security state still applicable
 
@@ -21,6 +22,7 @@ QUALITY_PROFILE: BUSINESS_APP
 - Guarded trip start permits a fully assigned draft to start without exposing the invalid `draft → in_transit` error while ordinary transition validation remains enforced.
 - Role visibility/action contract is frozen in `docs/ROLE_MATRIX.md`; mandatory auth remains disabled and owner developer access remains available.
 - Mobile drawer reachability/dismissal/accessibility is regression-covered; mobile acceptance traverses all connected workspaces and checks document-level horizontal overflow.
+- Operations readiness documents access-audit and recovery evidence procedures without falsely claiming an executed recovery drill.
 - 1C, EPD/УКЭП and billing remain readiness-only until real external configuration exists.
 
 ## Remaining findings
@@ -30,12 +32,12 @@ P1 / release boundary:
 - Full create-trip mutation E2E must use an isolated/synthetic environment or a proven cleanup contract, not production records.
 
 P2 / frontend:
-- Continue loading/empty/error acceptance for every workspace owner.
+- Finish exact-head verification of the expanded workspace-state matrix.
 - Continue incremental mobile CSS consolidation; no blind deletion of historical layers.
 - Continue narrow-mobile overlap/density review while preserving drawer reachability and touch targets.
 
 P2 / performance/runtime:
-- Review MapLibre map-specific loading/performance without regressing lazy workspace loading. `WorkspaceRouter` already lazy-loads `TripsPortal`; MapLibre remains scoped to that workspace chunk rather than the dashboard shell.
+- Review MapLibre map-specific loading/performance without regressing lazy workspace loading. `WorkspaceRouter` lazy-loads `TripsPortal`; MapLibre is currently imported inside that workspace bundle and remains a candidate for deeper deferred loading.
 - Trace `DEP0169` only when stack/dependency evidence identifies an actionable source.
 
 P2 / operations:
@@ -52,4 +54,4 @@ Owner/external gates:
 
 ## Reviewer decision
 
-LOGIX-004 remains IN_PROGRESS. This cycle closed the missing operations-documentation gap without performing risky production actions. No owner action is required now. Continue exact-head verification, workspace state acceptance, incremental CSS cleanup, MapLibre review and safe recovery/auth readiness work.
+LOGIX-004 remains IN_PROGRESS. This cycle expanded non-destructive workspace-state acceptance and synchronized Factory evidence. No owner action is required now. Continue exact-head verification, MapLibre review, incremental CSS cleanup and safe synthetic mutation coverage.
