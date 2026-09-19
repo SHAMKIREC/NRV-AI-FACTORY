@@ -45,18 +45,17 @@ STATUS: IN_PROGRESS
 - Vercel Hobby deployment remains within the 12 Node function limit.
 - Operations readiness includes access-audit procedure, backup/restore evidence rules, post-recovery numbering/idempotency checks, truthful RPO/RTO handling and commercial-readiness evidence checklist. Recovery drill remains explicitly pending and was not executed.
 - `e2e/workspace-state-matrix.spec.js` covers truthful empty/error/retry behavior for EPD, Drivers/Fleet, Analytics, 1C, Notifications and Settings without production mutation.
-- The transient workspace-fixture race was isolated and fixed without changing production business behavior. The failure route is armed only after workspace readiness so dashboard bootstrap cannot consume it accidentally.
-- Current LOGIX head is `6011aa075e36a194888ec5dfceff61931db97877` (`test(e2e): arm transient failures after workspace readiness`). LOGIX Quality #350 completed successfully on this exact head, including tests/build and the workflow's deployment/browser verification gates.
-- Runtime error aggregation shows no application exception cluster. The tracked Node `DEP0169` (`url.parse()`) deprecation still lacks evidence of application-owned usage.
-- `CorePortal.jsx` uses `fetchAllTrips()` for Analytics/1C/Notifications and no direct first-100 fetch remains in audited complete-trip consumers.
-- `WorkspaceRouter.jsx` lazy-loads `TripsPortal`; MapLibre remains imported inside the Trips workspace bundle and is queued for deeper map-specific deferred-loading review.
-- Mobile CSS remains intentionally layered: `mobile-overrides.css` is authoritative last, while `mobile-production.css` still owns non-duplicated workspace sizing/density rules. Wholesale deletion remains unsafe.
+- `CorePortal.jsx`, `FinancePortal.jsx`, `DocumentsPortal.jsx` and `DirectoryPortal.jsx` all consume the shared complete-trip reader; no audited business summary is intentionally limited to the first 100 trips.
+- `TripsPortal.jsx` is workspace-lazy but still statically imports MapLibre inside the Trips chunk. This is a performance opportunity, not a correctness defect; do not rewrite the map path without bundle/runtime evidence.
+- Mobile CSS remains intentionally layered: `mobile-overrides.css` is authoritative last. The current drawer rules explicitly constrain the open sidebar to `100dvh`, make it scrollable, keep nav/footer reachable, and preserve z-index ordering over workspace portals.
+- Current LOGIX head is `bced74f57327e82f4e218a27a68d28424e8eb7b6` (`test(mobile): lock authoritative cascade and drawer reachability`). LOGIX Quality #300 (run 35225977363) completed SUCCESS on this exact head.
+- Current cycle found no new P0/P1 correctness defect in the audited complete-trip consumers. Factory state was advanced to the exact verified head rather than making a speculative production rewrite.
 - No destructive DB/data operation, secret rotation, external 1C/EPD transaction, billing activation or mandatory-auth switch was performed in this cycle.
 
 ## Current priority queue
 
 1. Continue explicit loading/empty/error acceptance for any workspace state not yet isolated by fixtures.
-2. Consolidate historical mobile CSS incrementally with regression QA; preserve drawer reachability, safe areas and touch targets.
+2. Consolidate historical mobile CSS only incrementally with regression QA; preserve drawer reachability, safe areas and touch targets.
 3. Add isolated/synthetic mutation E2E only when it cannot persist production data.
 4. Trace Node `DEP0169` only when stack/dependency evidence identifies an actionable source.
 5. Continue MapLibre map-specific loading/performance review without regressing lazy workspace loading.
