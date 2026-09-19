@@ -44,23 +44,25 @@ STATUS: IN_PROGRESS
 - Narrow-mobile navigation is protected by regression tests for viewport reachability, scrolling, z-index ordering, dismissal and trigger accessibility state.
 - Driver account groundwork remains tenant-safe; production auth activation stays gated.
 - Vercel Hobby deployment remains within the 12 Node function limit.
-- Operations readiness now includes a concrete access-audit procedure, backup/restore evidence rules, post-recovery numbering/idempotency checks, truthful RPO/RTO handling, and a commercial-readiness evidence checklist. Recovery drill remains explicitly pending and was not executed.
-- Current LOGIX `main` is `614c75230bab18c32d8b32072db2bca4a1007706`.
-- Previous exact-head LOGIX Quality run #334 on `dc9133bc52eb95624402062b83c495bbdeb3c52d` completed successfully; run #335 for the current docs-only head is queued.
-- Runtime error aggregation previously showed no application exception cluster. The only tracked group is Node `DEP0169` (`url.parse()` deprecation); repository inspection has no evidence of application-owned `url.parse` use, so dependency/stack attribution is required before changing code.
-- `CorePortal.jsx` uses `fetchAllTrips()` for Analytics/1C/Notifications and no direct first-100 fetch remains in the audited complete-trip consumers.
-- `WorkspaceRouter.jsx` lazy-loads `TripsPortal`, so MapLibre is not part of the dashboard shell import path; deeper map-specific performance review remains queued.
+- Operations readiness includes access-audit procedure, backup/restore evidence rules, post-recovery numbering/idempotency checks, truthful RPO/RTO handling and commercial-readiness evidence checklist. Recovery drill remains explicitly pending and was not executed.
+- Added `e2e/workspace-state-matrix.spec.js` for non-mutating acceptance of EPD empty/readiness, Drivers/Fleet empty states, and Notifications/Settings recoverable failures.
+- Current LOGIX `main` is `4b1fb7491a2bc8e528491df0ee09c3b71600c066`.
+- LOGIX Quality #335 on `614c75230bab18c32d8b32072db2bca4a1007706` completed successfully. For intermediate `cd4647fc5dde73ea6ab2a80354a37b38a8f8db8a`, npm test/build passed, exact Vercel deployment became READY and health returned HTTP 200 with `database=ok`, `authMode=demo`, matching commit SHA. Exact-head run #337 is in progress.
+- Runtime error aggregation shows no application exception cluster. The only tracked group is Node `DEP0169` (`url.parse()` deprecation); repository inspection has no evidence of application-owned `url.parse` use, so dependency/stack attribution is required before changing code.
+- `CorePortal.jsx` uses `fetchAllTrips()` for Analytics/1C/Notifications and no direct first-100 fetch remains in audited complete-trip consumers.
+- `WorkspaceRouter.jsx` lazy-loads `TripsPortal`; MapLibre remains imported inside the Trips workspace bundle and is queued for deeper map-specific deferred-loading review.
 - Mobile CSS remains intentionally layered: `mobile-overrides.css` is authoritative last, while `mobile-production.css` still owns non-duplicated workspace sizing/density rules. Wholesale deletion remains unsafe.
 - No destructive DB/data operation, secret rotation, external 1C/EPD transaction, billing activation or mandatory-auth switch was performed in this cycle.
 
 ## Current priority queue
 
-1. Continue explicit loading/empty/error acceptance for every workspace owner and fix only reproducible gaps.
-2. Consolidate historical mobile CSS incrementally with regression QA; preserve drawer reachability, safe areas and touch targets.
-3. Add isolated/synthetic mutation E2E only when it cannot persist production data.
-4. Trace Node `DEP0169` only when stack/dependency evidence identifies an actionable source; do not guess-rewrite API URL handling.
-5. Continue MapLibre map-specific loading/performance review without regressing lazy workspace loading.
-6. Execute the documented access audit when mandatory-auth rollout rehearsal or commercial-readiness review is authorized; documentation is complete but an audit is not falsely marked executed.
-7. Prepare a recovery drill only on an isolated target and only after owner approval; do not restore production automatically.
-8. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
-9. Mandatory user auth remains rollout gated and must retain owner developer access.
+1. Finish exact-head verification for `4b1fb7491a2bc8e528491df0ee09c3b71600c066`, including browser smoke.
+2. Continue explicit loading/empty/error acceptance for any workspace state not yet isolated by fixtures; fix only reproducible gaps.
+3. Consolidate historical mobile CSS incrementally with regression QA; preserve drawer reachability, safe areas and touch targets.
+4. Add isolated/synthetic mutation E2E only when it cannot persist production data.
+5. Trace Node `DEP0169` only when stack/dependency evidence identifies an actionable source; do not guess-rewrite API URL handling.
+6. Continue MapLibre map-specific loading/performance review without regressing lazy workspace loading.
+7. Execute the documented access audit when mandatory-auth rollout rehearsal or commercial-readiness review is authorized; documentation is complete but an audit is not falsely marked executed.
+8. Prepare a recovery drill only on an isolated target and only after owner approval; do not restore production automatically.
+9. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
+10. Mandatory user auth remains rollout gated and must retain owner developer access.
