@@ -1,17 +1,17 @@
 TASK_ID: LOGIX-004
 STATUS: IN_PROGRESS
-SUMMARY: Исправлены два ложных падения browser QA в workspace state matrix: тесты Drivers/Fleet теперь проверяют фактический `.directory-state` и конкретные truthful empty-тексты, а Notifications после успешного retry проверяет корректное пустое состояние вместо несуществующей строки. Settings после retry по-прежнему требует три реальные строки настроек. Production business code не менялся.
+SUMMARY: Exact-production browser QA #345 exposed two deterministic fixture-isolation defects, not production business-code regressions. Drivers/Fleet attempted a second sidebar click while the full-screen Directory workspace intentionally covered canonical navigation; Notifications/Settings armed a one-shot `/api/trips` failure before the dashboard bootstrap request had fully settled. `e2e/workspace-state-matrix.spec.js` now waits for dashboard readiness before arming transient failures and reloads the canonical shell between full-screen directory workspaces.
 FILES_CHANGED: SHAMKIREC/LOGIX/e2e/workspace-state-matrix.spec.js; SHAMKIREC/NRV-AI-FACTORY/reports/LOGIX-004-REPORT.md
-COMMITS: LOGIX 2b20f7767486fe79e1204271dd33acbebbee7e7f
-TOOLKIT_RULES_APPLIED: BUSINESS_APP; truthful empty/error states; non-destructive production QA; owner DEV bypass preserved.
-BUILD_CHECK: Предыдущий head 00b4674f31298f1d0d43610a5dd510f72019392d: npm test 129/129 PASS, npm run build PASS. Новый head 2b20f7767486fe79e1204271dd33acbebbee7e7f: LOGIX Quality #345 запущен, итог pending.
-FUNCTIONAL_CHECK: Причины падения #344 подтверждены по Playwright logs: `.directory-empty` отсутствует в реальном DirectoryPortal; Notifications с пустым набором рейсов корректно не создаёт `.core-list > button`. Тесты синхронизированы с фактическими UI contracts.
-MOBILE_CHECK: В #344 mobile production smoke прошёл до state-matrix skip; mobile workspace traversal/overflow tests не были причиной падения.
-VISUAL_CHECK: Browser QA выполняется в CI на exact production deployment; итог нового head pending.
-ACCESSIBILITY_CHECK: Изменений production UI нет; существующие navigation/accessibility contracts не менялись.
-PERFORMANCE_CHECK: Build #344 PASS; известный отдельный warning MapLibre chunk ~920 kB остаётся в очереди на map-specific deferred-loading review.
-SECURITY_CHECK: Production code/auth/data не менялись; owner developer bypass сохранён; destructive DB/auth/external integration actions не выполнялись.
-REGRESSION_CHECK: #344 unit/contract suite 129/129 PASS; exact production deployment достигнут. Browser QA выявил только два устаревших ожидания fixture-тестов, исправленных в 2b20f776.
-KNOWN_ISSUES: Требуется завершение LOGIX Quality #345. Реальные 1С, ИС ЭПД/УКЭП, commercial billing и mandatory auth остаются owner/provider dependent. Recovery drill не выполнялся.
-EVIDENCE: GitHub Actions #344 id 35433711121; candidate #345 id 35437989277; exact-production wait #344 подтвердил commit 00b4674f31298f1d0d43610a5dd510f72019392d.
-RECOMMENDATION: Дождаться exact-head #345. Если green — продолжить incremental mobile CSS/MapLibre performance review; если red — исправлять только воспроизводимую причину по job logs.
+COMMITS: LOGIX e36602ebef70cfe1d0253576eb5dc9818bbd9919
+TOOLKIT_RULES_APPLIED: BUSINESS_APP; exact-production verification; truthful empty/error states; isolated non-mutating fixtures; owner DEV bypass preserved.
+BUILD_CHECK: LOGIX Quality #345 on 2b20f7767486fe79e1204271dd33acbebbee7e7f: npm test 129/129 PASS, npm run build PASS, exact production deployment reached. Candidate #346 on e36602ebef70cfe1d0253576eb5dc9818bbd9919 is running.
+FUNCTIONAL_CHECK: #345 browser logs confirmed Drivers/Fleet failure was pointer interception by the already-open `.directory-shell`; production smoke already proves canonical navigation when each full-screen workspace is entered from shell. Notifications/Settings failure was a request-order race in the synthetic fixture. Test setup now isolates those states without weakening production assertions.
+MOBILE_CHECK: #345 mobile production smoke and mobile workspace traversal passed; the failed state-matrix cases are desktop-only and skipped on mobile by design.
+VISUAL_CHECK: Exact-production Playwright QA is active in CI; candidate #346 pending.
+ACCESSIBILITY_CHECK: No production UI changed. Existing mobile drawer accessibility/navigation contracts remain intact.
+PERFORMANCE_CHECK: Build PASS on #345. Known MapLibre chunk warning remains queued for map-specific deferred-loading review.
+SECURITY_CHECK: No production auth/data/security code changed. Developer bypass remains intact. No migration, destructive DB operation, secret rotation, external 1C/EPD transaction, billing activation or mandatory-auth switch was performed.
+REGRESSION_CHECK: #345 unit/contract suite 129/129 PASS; browser failures were fixture sequencing only. Candidate #346 verifies the isolated repair against the exact Vercel commit.
+KNOWN_ISSUES: Finish LOGIX Quality #346. Real 1C, IS EPD/UKEP, commercial billing and mandatory auth remain provider/owner dependent. Recovery drill remains unexecuted.
+EVIDENCE: GitHub Actions #345 id 35437989277; candidate #346 id 35440022203; #345 exact-production wait confirmed commit 2b20f7767486fe79e1204271dd33acbebbee7e7f.
+RECOMMENDATION: If #346 is green, continue incremental mobile CSS/MapLibre performance review. If red, inspect exact failing browser trace and change only reproducible fixture/product behavior.
