@@ -34,10 +34,9 @@ STATUS: IN_PROGRESS
 - Center inventory/acceptance and real navigation ownership are synchronized with current LOGIX.
 - Owner developer/demo bypass remains intact and explicitly covered; it is not represented as completed production user authorization.
 - Desktop production smoke opens all connected workspaces through canonical navigation.
-- Mobile production coverage traverses every connected workspace (Trips, Documents, EPD, Counterparties, Fleet, Drivers, Dispatch, Finance, Analytics, 1C, Notifications, Settings), verifies each workspace renders, checks document-level horizontal overflow after every transition, and keeps the canonical menu trigger reachable.
+- Mobile production coverage traverses every connected workspace, verifies rendering and horizontal-overflow safety, and keeps canonical menu navigation reachable.
 - Golden trip propagation has regression coverage across Dashboard, global search, Core, Finance, Directory and Documents.
-- Complete-trip pagination is shared by DashboardLiveSummary, global search, Finance, Core, Documents and Directory. `test/allTripConsumersContracts.test.js` locks the complete persisted trip reader contract and prevents accidental return to first-100 business totals.
-- `src/tripData.js` follows `/api/trips` pagination until complete, rejects invalid pagination and caps client aggregation at 5000 rows pending future server aggregation.
+- Complete-trip pagination is shared by DashboardLiveSummary, global search, Finance, Core, Documents and Directory; first-100 business totals are regression-protected.
 - Trip create UI/server idempotency is production-enabled; migration 006 was applied earlier with owner approval and expired-key reuse is covered.
 - Trip start workflow supports an assigned draft without exposing the invalid `draft → in_transit` error while ordinary transition protection remains enforced.
 - Role visibility/action contract is frozen; developer/demo bypass remains allowed and mandatory auth remains disabled.
@@ -45,12 +44,11 @@ STATUS: IN_PROGRESS
 - Driver account groundwork remains tenant-safe; production auth activation stays gated.
 - Vercel Hobby deployment remains within the 12 Node function limit.
 - Operations readiness includes access-audit procedure, backup/restore evidence rules, post-recovery numbering/idempotency checks, truthful RPO/RTO handling and commercial-readiness evidence checklist. Recovery drill remains explicitly pending and was not executed.
-- `e2e/workspace-state-matrix.spec.js` covers EPD truthful empty/readiness and isolated recoverable EPD API failure with retry, Drivers/Fleet empty states, Analytics truthful zero-data state, 1C recoverable failure with retry, and Notifications/Settings recoverable failures without production mutation.
-- LOGIX Quality #341 completed successfully on `6cb008e236b7462732af114a1f11e42bed9e77a9`, including EPD recovery retry coverage.
-- LOGIX Quality #342 on `807ddcc30f03919800c532cf121335b559b45f03` passed all 129 unit/contract tests, build, exact-production deployment wait and the earlier browser smoke cases, but failed the new Notifications/Settings retry fixture because `openShell()` consumed the one-shot `/api/trips` failure before Core navigation.
-- The fixture race is corrected in `f6455955e3f007e96a4c0bd8bd57b4e113ef0002`: shell reloads are forced through a success response and the transient failure is armed only immediately before navigating into the target Core workspace. No production business code was changed for this test-only failure.
-- Current verification candidate is `f6455955e3f007e96a4c0bd8bd57b4e113ef0002`; exact-head CI/deployment verification is pending.
-- Runtime error aggregation shows no application exception cluster. The only tracked group is Node `DEP0169` (`url.parse()` deprecation); repository inspection has no evidence of application-owned `url.parse` use, so dependency/stack attribution is required before changing code.
+- `e2e/workspace-state-matrix.spec.js` covers truthful empty/error/retry behavior for EPD, Drivers/Fleet, Analytics, 1C, Notifications and Settings without production mutation.
+- LOGIX Quality #345 on `2b20f7767486fe79e1204271dd33acbebbee7e7f` passed all 129 unit/contract tests, build and exact-production deployment wait. Browser QA found two deterministic fixture sequencing defects: a second sidebar click while full-screen Directory covered navigation, and a one-shot Core `/api/trips` failure racing dashboard bootstrap.
+- Candidate `e36602ebef70cfe1d0253576eb5dc9818bbd9919` fixes only those E2E fixture-isolation defects: shell readiness is awaited before arming transient failure and the canonical shell is reloaded between Drivers and Fleet. Production business code is unchanged.
+- LOGIX Quality #346 for `e36602ebef70cfe1d0253576eb5dc9818bbd9919` is currently running exact-head verification.
+- Runtime error aggregation shows no application exception cluster. The tracked Node `DEP0169` (`url.parse()`) deprecation still lacks evidence of application-owned usage.
 - `CorePortal.jsx` uses `fetchAllTrips()` for Analytics/1C/Notifications and no direct first-100 fetch remains in audited complete-trip consumers.
 - `WorkspaceRouter.jsx` lazy-loads `TripsPortal`; MapLibre remains imported inside the Trips workspace bundle and is queued for deeper map-specific deferred-loading review.
 - Mobile CSS remains intentionally layered: `mobile-overrides.css` is authoritative last, while `mobile-production.css` still owns non-duplicated workspace sizing/density rules. Wholesale deletion remains unsafe.
@@ -58,13 +56,13 @@ STATUS: IN_PROGRESS
 
 ## Current priority queue
 
-1. Finish exact-head verification for `f6455955e3f007e96a4c0bd8bd57b4e113ef0002` and fix only reproducible failures.
-2. Continue explicit loading/empty/error acceptance for any workspace state not yet isolated by fixtures; fix only reproducible gaps.
+1. Finish exact-head verification for `e36602ebef70cfe1d0253576eb5dc9818bbd9919` / LOGIX Quality #346 and fix only reproducible failures.
+2. Continue explicit loading/empty/error acceptance for any workspace state not yet isolated by fixtures.
 3. Consolidate historical mobile CSS incrementally with regression QA; preserve drawer reachability, safe areas and touch targets.
 4. Add isolated/synthetic mutation E2E only when it cannot persist production data.
-5. Trace Node `DEP0169` only when stack/dependency evidence identifies an actionable source; do not guess-rewrite API URL handling.
+5. Trace Node `DEP0169` only when stack/dependency evidence identifies an actionable source.
 6. Continue MapLibre map-specific loading/performance review without regressing lazy workspace loading.
-7. Execute the documented access audit when mandatory-auth rollout rehearsal or commercial-readiness review is authorized; documentation is complete but an audit is not falsely marked executed.
+7. Execute the documented access audit only when mandatory-auth rollout rehearsal or commercial-readiness review is authorized.
 8. Prepare a recovery drill only on an isolated target and only after owner approval; do not restore production automatically.
 9. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
 10. Mandatory user auth remains rollout gated and must retain owner developer access.
