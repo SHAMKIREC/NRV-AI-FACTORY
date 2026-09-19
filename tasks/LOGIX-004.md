@@ -34,7 +34,7 @@ STATUS: IN_PROGRESS
 - Center inventory/acceptance and real navigation ownership are synchronized with current LOGIX.
 - Owner developer/demo bypass remains intact and explicitly covered; it is not represented as completed production user authorization.
 - Desktop production smoke opens all connected workspaces through canonical navigation.
-- Mobile production coverage now traverses every connected workspace (Trips, Documents, EPD, Counterparties, Fleet, Drivers, Dispatch, Finance, Analytics, 1C, Notifications, Settings), verifies each workspace renders, checks document-level horizontal overflow after every transition, and keeps the canonical menu trigger reachable.
+- Mobile production coverage traverses every connected workspace (Trips, Documents, EPD, Counterparties, Fleet, Drivers, Dispatch, Finance, Analytics, 1C, Notifications, Settings), verifies each workspace renders, checks document-level horizontal overflow after every transition, and keeps the canonical menu trigger reachable.
 - Golden trip propagation has regression coverage across Dashboard, global search, Core, Finance, Directory and Documents.
 - Complete-trip pagination is shared by DashboardLiveSummary, global search, Finance, Core, Documents and Directory. `test/allTripConsumersContracts.test.js` locks the complete persisted trip reader contract and prevents accidental return to first-100 business totals.
 - `src/tripData.js` follows `/api/trips` pagination until complete, rejects invalid pagination and caps client aggregation at 5000 rows pending future server aggregation.
@@ -45,9 +45,9 @@ STATUS: IN_PROGRESS
 - Driver account groundwork remains tenant-safe; production auth activation stays gated.
 - Vercel Hobby deployment remains within the 12 Node function limit.
 - Operations readiness includes access-audit procedure, backup/restore evidence rules, post-recovery numbering/idempotency checks, truthful RPO/RTO handling and commercial-readiness evidence checklist. Recovery drill remains explicitly pending and was not executed.
-- Added `e2e/workspace-state-matrix.spec.js` for non-mutating acceptance of EPD empty/readiness, Drivers/Fleet empty states, and Notifications/Settings recoverable failures.
-- Current LOGIX verification candidate is `c6293210f34e68702b0ab698ab017646126ce386` (`test(mobile): cover every workspace for viewport overflow`).
-- LOGIX Quality #338 is running exact-head verification for `c6293210f34e68702b0ab698ab017646126ce386`; the previous exact-head LOGIX Quality #337 for `4b1fb7491a2bc8e528491df0ee09c3b71600c066` completed successfully.
+- `e2e/workspace-state-matrix.spec.js` now covers EPD empty/readiness, Drivers/Fleet empty states, Analytics truthful zero-data state, 1C recoverable failure, and Notifications/Settings recoverable failures without production mutation.
+- LOGIX Quality #338 completed successfully on `c6293210f34e68702b0ab698ab017646126ce386`.
+- Current verification candidate is `26a3e1cb72fb1a0529e1e7e4f55781608495165d` (`test(e2e): cover analytics empty and 1c failure states`); LOGIX Quality #339 is running exact-head verification.
 - Runtime error aggregation shows no application exception cluster. The only tracked group is Node `DEP0169` (`url.parse()` deprecation); repository inspection has no evidence of application-owned `url.parse` use, so dependency/stack attribution is required before changing code.
 - `CorePortal.jsx` uses `fetchAllTrips()` for Analytics/1C/Notifications and no direct first-100 fetch remains in audited complete-trip consumers.
 - `WorkspaceRouter.jsx` lazy-loads `TripsPortal`; MapLibre remains imported inside the Trips workspace bundle and is queued for deeper map-specific deferred-loading review.
@@ -56,7 +56,7 @@ STATUS: IN_PROGRESS
 
 ## Current priority queue
 
-1. Finish exact-head verification for the all-workspace mobile overflow/navigation matrix and fix only reproducible failures.
+1. Finish exact-head verification for the expanded workspace state matrix and fix only reproducible failures.
 2. Continue explicit loading/empty/error acceptance for any workspace state not yet isolated by fixtures; fix only reproducible gaps.
 3. Consolidate historical mobile CSS incrementally with regression QA; preserve drawer reachability, safe areas and touch targets.
 4. Add isolated/synthetic mutation E2E only when it cannot persist production data.
