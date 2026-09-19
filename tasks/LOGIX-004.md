@@ -47,7 +47,7 @@ STATUS: IN_PROGRESS
 - Operations readiness includes access-audit procedure, backup/restore evidence rules, post-recovery numbering/idempotency checks, truthful RPO/RTO handling and commercial-readiness evidence checklist. Recovery drill remains explicitly pending and was not executed.
 - Added `e2e/workspace-state-matrix.spec.js` for non-mutating acceptance of EPD empty/readiness, Drivers/Fleet empty states, and Notifications/Settings recoverable failures.
 - Current LOGIX `main` is `4b1fb7491a2bc8e528491df0ee09c3b71600c066`.
-- LOGIX Quality #335 on `614c75230bab18c32d8b32072db2bca4a1007706` completed successfully. For intermediate `cd4647fc5dde73ea6ab2a80354a37b38a8f8db8a`, npm test/build passed, exact Vercel deployment became READY and health returned HTTP 200 with `database=ok`, `authMode=demo`, matching commit SHA. Exact-head run #337 is in progress.
+- Exact-head LOGIX Quality #337 for `4b1fb7491a2bc8e528491df0ee09c3b71600c066` completed successfully on 2026-09-19. The immediately preceding workspace-state run was superseded/cancelled by the copy-alignment fix; the replacement exact-head run is green.
 - Runtime error aggregation shows no application exception cluster. The only tracked group is Node `DEP0169` (`url.parse()` deprecation); repository inspection has no evidence of application-owned `url.parse` use, so dependency/stack attribution is required before changing code.
 - `CorePortal.jsx` uses `fetchAllTrips()` for Analytics/1C/Notifications and no direct first-100 fetch remains in audited complete-trip consumers.
 - `WorkspaceRouter.jsx` lazy-loads `TripsPortal`; MapLibre remains imported inside the Trips workspace bundle and is queued for deeper map-specific deferred-loading review.
@@ -56,13 +56,12 @@ STATUS: IN_PROGRESS
 
 ## Current priority queue
 
-1. Finish exact-head verification for `4b1fb7491a2bc8e528491df0ee09c3b71600c066`, including browser smoke.
-2. Continue explicit loading/empty/error acceptance for any workspace state not yet isolated by fixtures; fix only reproducible gaps.
-3. Consolidate historical mobile CSS incrementally with regression QA; preserve drawer reachability, safe areas and touch targets.
-4. Add isolated/synthetic mutation E2E only when it cannot persist production data.
-5. Trace Node `DEP0169` only when stack/dependency evidence identifies an actionable source; do not guess-rewrite API URL handling.
-6. Continue MapLibre map-specific loading/performance review without regressing lazy workspace loading.
-7. Execute the documented access audit when mandatory-auth rollout rehearsal or commercial-readiness review is authorized; documentation is complete but an audit is not falsely marked executed.
-8. Prepare a recovery drill only on an isolated target and only after owner approval; do not restore production automatically.
-9. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
-10. Mandatory user auth remains rollout gated and must retain owner developer access.
+1. Continue explicit loading/empty/error acceptance for any workspace state not yet isolated by fixtures; fix only reproducible gaps.
+2. Consolidate historical mobile CSS incrementally with regression QA; preserve drawer reachability, safe areas and touch targets.
+3. Add isolated/synthetic mutation E2E only when it cannot persist production data.
+4. Trace Node `DEP0169` only when stack/dependency evidence identifies an actionable source; do not guess-rewrite API URL handling.
+5. Continue MapLibre map-specific loading/performance review without regressing lazy workspace loading.
+6. Execute the documented access audit when mandatory-auth rollout rehearsal or commercial-readiness review is authorized; documentation is complete but an audit is not falsely marked executed.
+7. Prepare a recovery drill only on an isolated target and only after owner approval; do not restore production automatically.
+8. Real 1C, real EPD/УКЭП and commercial billing activation remain blocked on actual provider/operator configuration; do not invent external connectivity.
+9. Mandatory user auth remains rollout gated and must retain owner developer access.
