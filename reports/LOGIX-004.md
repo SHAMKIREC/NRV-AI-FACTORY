@@ -6,11 +6,10 @@ QUALITY_PROFILE: BUSINESS_APP
 
 ## Current verified checkpoint — 2026-09-19
 
-- Previous exact-head LOGIX Quality #337 completed SUCCESS on `4b1fb7491a2bc8e528491df0ee09c3b71600c066`.
-- Current verification candidate is `c6293210f34e68702b0ab698ab017646126ce386`.
-- Mobile production smoke was expanded from four representative workspaces to all connected workspaces. The test now verifies each workspace renders on mobile, checks document-level horizontal overflow after every workspace transition, and confirms the active canonical menu trigger remains reachable.
-- LOGIX Quality #338 is running exact-head verification for `c6293210f34e68702b0ab698ab017646126ce386`; final deployment/browser evidence is pending completion of that workflow.
-- A dedicated non-mutating browser-fixture state matrix remains in place for EPD truthful empty/readiness state, Drivers/Fleet truthful empty states, and Notifications/Settings recoverable API failures.
+- LOGIX Quality #338 completed SUCCESS on `c6293210f34e68702b0ab698ab017646126ce386`, including the all-workspace mobile render/overflow/navigation matrix.
+- Current verification candidate is `26a3e1cb72fb1a0529e1e7e4f55781608495165d`.
+- Non-mutating browser-fixture acceptance was expanded to Analytics truthful zero-data behavior and 1C recoverable API failure, in addition to EPD truthful empty/readiness, Drivers/Fleet truthful empty states, and Notifications/Settings recoverable failures.
+- LOGIX Quality #339 is running exact-head verification for `26a3e1cb72fb1a0529e1e7e4f55781608495165d`; final exact-head deployment/browser evidence is pending completion of that workflow.
 - Runtime error aggregation for the last 24 hours still shows only Node `DEP0169` (`url.parse()` deprecation), not an application exception cluster. No repository-owned source is changed without stack/dependency attribution.
 - Owner developer/demo bypass remains protected and mandatory auth remains disabled.
 - No production data, schema, secret, external 1C/EPD transaction, billing activation, recovery restore or developer bypass was changed in this cycle.
@@ -21,7 +20,7 @@ QUALITY_PROFILE: BUSINESS_APP
 - Trip create idempotency is enabled after approved migration 006 and guarded by tenant-scoped server replay/conflict rules.
 - Guarded trip start permits a fully assigned draft to start without exposing the invalid `draft → in_transit` error while ordinary transition validation remains enforced.
 - Role visibility/action contract is frozen in `docs/ROLE_MATRIX.md`; mandatory auth remains disabled and owner developer access remains available.
-- Mobile drawer reachability/dismissal/accessibility is regression-covered; mobile acceptance now traverses all connected workspaces and checks document-level horizontal overflow.
+- Mobile drawer reachability/dismissal/accessibility is regression-covered; mobile acceptance traverses all connected workspaces and checks document-level horizontal overflow.
 - Operations readiness documents access-audit and recovery evidence procedures without falsely claiming an executed recovery drill.
 - 1C, EPD/УКЭП and billing remain readiness-only until real external configuration exists.
 
@@ -32,7 +31,7 @@ P1 / release boundary:
 - Full create-trip mutation E2E must use an isolated/synthetic environment or a proven cleanup contract, not production records.
 
 P2 / frontend:
-- Finish exact-head verification of the expanded all-workspace mobile overflow/navigation matrix.
+- Finish exact-head verification of the expanded workspace state matrix.
 - Continue incremental mobile CSS consolidation; no blind deletion of historical layers.
 - Continue narrow-mobile overlap/density review while preserving drawer reachability and touch targets.
 
@@ -54,4 +53,4 @@ Owner/external gates:
 
 ## Reviewer decision
 
-LOGIX-004 remains IN_PROGRESS. This cycle expanded mobile acceptance to every connected workspace without mutating production data and synchronized Factory evidence. No owner action is required now. Continue exact-head verification, loading/empty/error coverage, MapLibre review, incremental CSS cleanup and safe synthetic mutation coverage.
+LOGIX-004 remains IN_PROGRESS. This cycle expanded non-mutating acceptance for Analytics and 1C while preserving the owner developer bypass and production data. No owner action is required now. Continue exact-head verification, remaining state coverage, MapLibre review, incremental CSS cleanup and safe synthetic mutation coverage.
